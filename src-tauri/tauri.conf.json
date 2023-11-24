@@ -1,0 +1,39 @@
+{
+    "build": {
+        "beforeDevCommand": "pnpm dev",
+        "beforeBuildCommand": "pnpm build",
+        "devPath": "http://localhost:1421",
+        "distDir": "../dist",
+        "withGlobalTauri": true
+    },
+    "package": {
+        "productName": "fs-app",
+        "version": "0.0.0"
+    },
+    "tauri": {
+        "allowlist": {
+            "all": false,
+            "path": { "all": true }
+        },
+        "bundle": {
+            "active": true,
+            "targets": "all",
+            "identifier": "com.tauri.4jairo.fs-app",
+            "icon": ["icons/icon.ico"]
+        },
+        "security": {
+            "csp": null
+        }, 
+        "windows": [
+            {
+                "fullscreen": false,
+                "resizable": true,
+                "title": "fs-app",
+                "width": 800,
+                "height": 600,
+                "minWidth": 860,
+                "minHeight": 0
+            }
+        ]
+    }
+}

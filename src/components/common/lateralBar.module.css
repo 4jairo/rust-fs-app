@@ -1,0 +1,31 @@
+.container {
+  background-color: var(--secundaryColor);
+  width: var(--lateralBarWidth);
+  height: var(--mainContentHeight);
+  border-right: solid 1px var(--borderColor);
+  overflow-y: auto;
+  display: flex;
+}
+.content {
+  padding: 5px;
+  width: 100%;
+}
+.content button {
+  all: unset;
+  width: calc(100% - 6px);
+  padding: 3px;
+  border-radius: 2px;
+}
+.content button:hover {
+  background-color: var(--hoverColor) !important;
+}
+.content h3 {
+  cursor: default;
+  width: fit-content;
+  margin: 0 0 10px 5%;
+}
+
+.resizeBar {
+  padding: 2px;
+  cursor: col-resize;
+}

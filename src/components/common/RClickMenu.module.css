@@ -1,0 +1,22 @@
+.content > * {
+  display: flex;
+  gap: 5px;
+  height: 30px;
+  padding: 5px;
+}
+.separation {
+  padding: 0;
+  width: 90%;
+  margin: 2px auto;
+  height: 1px;
+  background-color: var(--borderColor);
+}
+.content > *:hover {
+  background-color: var(--hoverColor)
+}
+.iconContainer {
+  height: 100%;
+}
+.iconContainer > * {
+  height: 100%;
+}

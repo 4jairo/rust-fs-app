@@ -1,0 +1,91 @@
+/* 
+? #mainContent-fs-parent:
+{
+  width: var(--mainContentWidth);
+  height: var(--mainContentHeight);
+  overflow: auto;
+}
+
+? #maincontent-fs (.container): 
+*/
+.container {
+  width: 100%;
+  display: flex;
+}
+
+/* left container for init selectBox */
+.selectBoxContainer {
+  padding: 8px;
+}
+
+/* table class */
+.fileTable {
+  overflow-y: scroll;
+  border-collapse: collapse;
+  table-layout: auto;
+  width: 100%;
+}
+
+.fileTable > thead {
+  position: sticky;
+  top: 0;
+  background-color: var(--primaryColor);
+}
+.fileTable th {
+  padding: 8px;
+  resize: horizontal;
+  cursor: pointer;
+}
+.fileTable td {
+  padding: 4px;
+}
+.fileTable th, .fileTable td {
+  min-width: 80px;
+  overflow: hidden;
+  border-bottom: solid 1px var(--borderColor);
+  height: 35px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* selected row */
+.fileTable .trSelected td {
+  background-color: var(--selectElementColor)
+}
+
+/* (Type, Size, Date) col */
+.fileTable td:not(.trName, .trNameSelected) {
+  text-align: center;
+}
+.fileTable tr:hover > td {
+  background-color: var(--secundaryHoverColor)
+}
+
+/* (Name) col */
+.trName {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.fileIcon {
+  height: 20px;
+}
+.fileIcon > * {
+  height: 100%;
+}
+
+/* (Name -> [name && path]) col when currentPath is search */
+.trNameSearch > div {
+  display: flex;
+  padding: 2px;
+}
+.searchFileLocation {
+  display: flex;
+  align-items: center;
+  background-color: rgb(26, 26, 26);
+  border-radius: 3px;
+  padding: 2px;
+  margin: 2px;
+  margin-top: 6px;
+}

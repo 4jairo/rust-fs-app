@@ -1,0 +1,36 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: var(--utilitiesMenuHeight);
+  background-color: var(--secundaryColor);
+  border: 1px solid var(--borderColor); 
+  white-space: nowrap;
+  overflow: hidden;
+  z-index: 100;
+}
+.hovereable {
+  border-radius: 4px;
+}
+.hovereable:hover {
+  background-color: var(--hoverColor);
+}
+.container > * {
+  cursor: pointer;
+  display: flex;
+  margin: 0 7px;
+  padding: 1px;
+}
+.notAvaliable {
+  opacity: .4;
+}
+.changeWindowContent {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+}
+.changeWindowContent > div {
+  display: flex;
+  justify-content: center;
+}

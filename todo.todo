@@ -1,0 +1,15 @@
+//TODO
+
+front-end: 
+  select current page and all pages btns (pathMenu)
+  preVisualization (images)
+  rename current path bug (from windows explorer)
+  handle errors (invokeApi.ts)
+  update info (tauriApiTypes.d.ts)
+
+back-end:
+  frequent files
+  move searches to backend ($FileContext) (better???)
+
+both: 
+  remove app

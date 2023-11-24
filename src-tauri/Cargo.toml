@@ -1,0 +1,36 @@
+[package]
+name = "fs-app"
+version = "1.0.0"
+description = "fs-cacher-app"
+authors = ["4jairo"]
+license = ""
+repository = ""
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "1.4", features = [] }
+
+[dependencies]
+tauri = { version = "1.4", features = [ "path-all"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+rayon = "1.7.0"
+lazy_static = "1.4.0"
+disk_list = "0.2.10"
+notify = "6.1.1"
+open = "5.0.0"
+winreg = "0.51.0"
+trash = "3.1.2"
+rustc-hash = "1.1.0" 
+
+[features]
+custom-protocol = ["tauri/custom-protocol"]
+
+
+[profile.release]
+opt-level = 3
+
+[profile.release.package."*"]
+opt-level = 3
+
