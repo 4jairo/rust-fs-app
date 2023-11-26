@@ -8,6 +8,7 @@
   import { existentFile, getFileContent, getImgBlob } from "../../../tauriApi/invokeApi";
   import { PreVisualizationContext } from "../../../context/preVisualization";
   import hljs from 'highlight.js'
+  import { isImage } from "../../../context/isImage";
   import 'highlight.js/styles/atom-one-dark-reasonable.css'
  
   $: preVisContext = $PreVisualizationContext
@@ -24,28 +25,47 @@
     })
   }
 
-  let imageURL = ''
-  let fileContent = { content: '', ok: true }
+  let fileContent = { content: '', ok: true, isImage: false }
   $: currentPath = $FileCopyContext.selectedFilesPath[0]
   
-  $: if (currentPath) { 
+  $: if (currentPath) {
     (async () => {
       const existentPath = await existentFile(currentPath)
       if(existentPath.is_dir) return
 
-      if(currentPath.endsWith('png')) {
-        const result = await getImgBlob(currentPath)
-        if(!result) return
-        
-        imageURL = URL.createObjectURL(
-          new Blob([result.buffer], { type: 'image/png' })
-        )
+      const fileExt = currentPath.split('.').pop()!
+
+      if(isImage(fileExt) && fileExt !== 'svg') {
+        // is image
+        try {
+          const result = await getImgBlob(currentPath)
+          if(!result) throw null
+
+          const binaryString = String.fromCharCode(...result)
+          const base64Img = `data:image/${fileExt};base64,${btoa(binaryString)}`
+
+          const img = new Image()
+          img.onerror = () => {
+            fileContent.isImage = false
+            fileContent.content = "can't get image"
+          }
+          img.onload = () => {
+            fileContent.isImage = true
+            fileContent.content = base64Img
+          }
+          img.src = base64Img
+
+        } catch {
+          fileContent.isImage = false
+          fileContent.content = "can't get image"
+        }
 
         return
       }
 
+      // plain txt
       const content = await getFileContent(currentPath)
-      const fileExt = currentPath.split('.').pop()!
+      fileContent.isImage = false
       try {
         const result = hljs.highlight(content, { language: fileExt }).value
         fileContent.content = result
@@ -61,28 +81,28 @@
 <div class="container" on:click={updateContainerContext}>
   <div class="resizeBar" on:mousedown={handleResize}></div>
 
-  <div class="content" id="preVisualizationContainer">  
-    <!-- text -->
-    {#if preVisContext.altZ}
-      {#if fileContent.ok}
-        {@html fileContent.content}
-      {:else}
-        <span>{fileContent.content}</span>
-      {/if}
+  <div class="content" id="preVisualizationContainer">
+    {#if fileContent.isImage}
+      <!-- image -->
+      <img src={fileContent.content} alt={currentPath}/>
+
     {:else}
-      {#if fileContent.ok}
-        <pre>{@html fileContent.content}</pre>
+      <!-- text -->
+      {#if preVisContext.altZ}
+        {#if fileContent.ok}
+          <p>{@html fileContent.content}</p>
+        {:else}
+          <span>{fileContent.content}</span>
+        {/if}
       {:else}
-        <span>{fileContent.content}</span>
+        {#if fileContent.ok}
+          <pre>{@html fileContent.content}</pre>
+        {:else}
+          <span>{fileContent.content}</span>
+        {/if}
       {/if}
     {/if}
 
-    <!--img-->
-    {#key imageURL}
-      {#if imageURL}
-        <img src={imageURL} alt={imageURL}/>
-      {/if}
-    {/key}
   </div>
 </div>
 
@@ -105,6 +125,10 @@
   .content * {
     padding: 0;
     background-color: var(--secundaryColor) !important;
+  }
+  .content img {
+    width: 100%;
+    height: 100%;
   }
 
   .resizeBar {

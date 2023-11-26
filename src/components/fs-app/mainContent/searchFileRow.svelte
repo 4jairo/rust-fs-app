@@ -20,7 +20,7 @@
   export let currentPath: FileRowSearchProps['currentPath'] 
   
   const changeSelectedFiles = () => {
-    const ctrlPressed = $ShortcutKeysContext. keys.includes('control')
+    const ctrlPressed = $ShortcutKeysContext.keys.includes('control')
     FileCopyContext.updateFileSelection([path], ctrlPressed)
   }
 
