@@ -10,6 +10,10 @@
   user-select: none;
 }
 
+#preVisualizationContainer * {
+  user-select: text;
+}
+
 :root {
   /* colors */
   --primaryColor: #131313;
