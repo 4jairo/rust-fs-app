@@ -11,7 +11,7 @@
     //console.log(e.key)
 
     if(e.key === 'F12') return
-    if(e.altKey) e.preventDefault()
+    if(e.altKey || (e.ctrlKey && e.key === 'f')) e.preventDefault() 
 
     ShortcutKeysContext.addKey(e.key.toLowerCase())
 

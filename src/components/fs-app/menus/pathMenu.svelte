@@ -113,6 +113,17 @@
     searchInput.focus()
   }
 
+  const handleChangeSearchMode = async () => {
+    const fileList = await getDirContent(currentPath.path)
+
+    FileContext.addDirToHistory({
+      isDirectory: true,
+      name: useSplitPath(currentPath.path).pop()!,
+      path: currentPath.path,
+      fileList
+    })
+  }
+
   const handeUpdateAutoComplete = async (event: EventEv<HTMLInputElement>) => {
     //@ts-ignore
     const currentValue: string = event.target.value
@@ -187,6 +198,12 @@
     <div class="hovereable" on:click={() => pathInputShape = !pathInputShape} title="edit current path">
       <Icons icon='edit' size={25}/>
     </div>
+
+    {#if !currentPath.isDirectory}
+      <div class="hovereable" on:click={handleChangeSearchMode} title="change search mode (on current path)">
+        <Icons icon='search-off' size={25}/>
+      </div>
+    {/if}
   
     {#key currentPath.path}  
       {#key lastItemIndexPagination}  

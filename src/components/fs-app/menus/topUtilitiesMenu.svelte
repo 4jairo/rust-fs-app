@@ -108,6 +108,7 @@
   <section class="{topMenuStyles.hovereable} inputContainer">
     <div>
       <input 
+        id="filterQueryFilter-fs"
         type="text" placeholder="filter by name..."
         bind:value={searchParamsContext.filterQuery}
         on:input={(e) => SearchParamsTopMenuFs.updateFilterQuery(e.currentTarget.value)}

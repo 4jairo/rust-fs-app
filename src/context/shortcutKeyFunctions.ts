@@ -116,6 +116,13 @@ const keyShortcutsFs: keyShortcutsType[] = [
         PreVisualizationContext.update(prev => ({ ...prev, altZ: !prev.altZ }))
       }
     }
+  },
+  {
+    keys: ['control', 'f'],
+    fn: () => {
+      const filterInputElmnt = document.getElementById('filterQueryFilter-fs') as HTMLInputElement
+      filterInputElmnt.focus()
+    }
   }
 ]
 

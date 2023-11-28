@@ -2,7 +2,6 @@
 
 front-end: 
   select current page and all pages btns (pathMenu)
-  preVisualization (images)
   rename current path bug (from windows explorer)
   handle errors (invokeApi.ts)
   update info (tauriApiTypes.d.ts)
