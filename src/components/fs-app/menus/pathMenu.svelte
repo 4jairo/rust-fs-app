@@ -65,7 +65,10 @@
 
   const handleSubmit = async (newPath: string) => {
     const fileSearch = await existentFile(newPath)
-    if(fileSearch.is_dir && currentPath.path !== newPath) {
+
+    if(fileSearch.is_dir) {
+      if(currentPath.path !== newPath) return
+
       return FileContext.addDirToHistory({
         isDirectory: currentPath.isDirectory,
         name: useSplitPath(newPath).pop() as string,
@@ -77,8 +80,7 @@
     }
 
     else if(fileSearch.is_file) {
-      await openFile(newPath)
-      return
+      return await openFile(newPath)
     }
 
     await showErrorAlert(`<b>${newPath}</b> is not a valid folder path`)

@@ -1,47 +1,6 @@
-export type IconType =
-| 'add'
-| 'larr'
-| 'double-larr'
-| 'rarr'
-| 'double-rarr'
-| 'caret'
-| 'new-folder'
-| 'folder-open'
-| 'new-file'
-| 'search'
-| 'search-confirm'
-| 'terminal'
-| 'remove'
-| 'edit'
-| 'sw-left'
-| 'sw-right'
-| 'admin'
-| 'launch'
-| 'exact-name'
-| 'folder-path'
-| 'resize-h'
-| 'sort'
-| 'copy'
-| 'paste'
-| 'cut'
-| 'select'
-| 'selectAll'
-| 'select-fill' 
-| 'selectAll-fill' 
-| 'theme'
-| 'visualization'
-| 'visualization-fill'
-| 'loading-gif'
-| 'copy-path'
-| 'filter'
-| 'files'
-| 'search-off'
+export type IconsType = keyof typeof ICONS
 
-type IconsObj = {
-  [name: string]: (size: number) => string
-}
-
-export const ICONS: IconsObj = {
+export const ICONS = {
   select: (size: number) => `<svg xmlns="http://www.w3.org/2000/svg" width=${size} height=${size} viewBox="0 0 20 20"><path fill="#ffffff" d="M6 3a3 3 0 0 0-3 3v8a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3H6ZM4 6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6Zm9.854 1.854a.5.5 0 0 0-.708-.708L8.5 11.793l-1.646-1.647a.5.5 0 0 0-.708.708l2 2a.5.5 0 0 0 .708 0l5-5Z"/></svg>`,
   selectAll: (size: number) => `<svg xmlns="http://www.w3.org/2000/svg" width=${size} height=${size} viewBox="0 0 24 24"><path fill="#ffffff" d="M20.496 5.627A2.25 2.25 0 0 1 22 7.75v10A4.25 4.25 0 0 1 17.75 22h-10a2.25 2.25 0 0 1-2.123-1.504l2.097.004H17.75a2.75 2.75 0 0 0 2.75-2.75v-10l-.004-.051V5.627ZM17.246 2a2.25 2.25 0 0 1 2.25 2.25v12.997a2.25 2.25 0 0 1-2.25 2.25H4.25A2.25 2.25 0 0 1 2 17.247V4.25A2.25 2.25 0 0 1 4.25 2h12.997Zm0 1.5H4.25a.75.75 0 0 0-.75.75v12.997c0 .414.336.75.75.75h12.997a.75.75 0 0 0 .75-.75V4.25a.75.75 0 0 0-.75-.75Zm-7.665 7.858L13.47 7.47a.75.75 0 0 1 1.133.976l-.073.084l-4.5 4.5a.75.75 0 0 1-1.056.004L8.9 12.95l-1.5-2a.75.75 0 0 1 1.127-.984l.073.084l.981 1.308L13.47 7.47l-3.89 3.888Z"/></svg>`,
   'select-fill': (size: number) => `<svg xmlns="http://www.w3.org/2000/svg" width=${size} height=${size} viewBox="0 0 16 16"><path fill="#ffffff" d="M4.5 2A2.5 2.5 0 0 0 2 4.5v7A2.5 2.5 0 0 0 4.5 14h7a2.5 2.5 0 0 0 2.5-2.5v-7A2.5 2.5 0 0 0 11.5 2h-7Zm6.354 4.854l-3.5 3.5a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 9.293l3.146-3.147a.5.5 0 0 1 .708.708Z"/></svg>`,

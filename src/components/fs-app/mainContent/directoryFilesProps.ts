@@ -1,5 +1,5 @@
 import type { getDirContentType } from '../../../tauriApi/tauriApiTypes'
-import type { IconType } from '../../common/icons';
+import type { IconsType } from '../../common/icons'
 
 //! R CLICK
 export interface RClickCommomPropsFs {
@@ -20,7 +20,7 @@ export interface FileRowSearchProps extends FileRowProps {
 
 export interface RCLickOptionsType { 
   title: string
-  icon: IconType
+  icon: IconsType
   fn: () => void
   condition?: boolean
   separation?: true
