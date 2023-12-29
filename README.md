@@ -17,3 +17,6 @@ This template should help get you started developing with Tauri, Svelte and Type
 # Start app
 - npm run tauri dev
 - pnpm tauri dev
+
+# Compatilbe
+  - windows
