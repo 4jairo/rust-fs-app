@@ -1,128 +1,142 @@
+use std::{sync::{Mutex, Arc}, thread, path::Path, time::Duration};
+use rustc_hash::FxHashMap;
 use serde::Serialize;
-use tauri::Manager;
-use std::sync::Arc;
-use std::{thread, path::Path};
-use std::time::Duration;
-use super::constants::{FINISH_DISCOVER_DISK_REPLY_EVENT, GET_OS_DISKS_REPLY_EVENT};
-use super::cacher::discover::{discover_disk, un_discover_disk}; 
-use super::notify_changes::start_disk_notify;
+use lazy_static::lazy_static;
+use tauri::{AppHandle, Manager};
+use super::{
+   notify_changes::start_disk_notify,
+   cacher::discover::{discover_disk, un_discover_disk},
+   constants::{FINISH_DISCOVER_DISK_REPLY_EVENT, GET_OS_DISKS_REPLY_EVENT},
+   error_format::send_err
+};
 
-type DiskListType = Vec<Vec<String>>;
+
+#[derive(Serialize, Clone, Debug)]
+pub enum DiskStatus {
+    Loading,
+    Loaded,
+    Ejected
+}
+
 
 #[derive(Serialize, Clone, Debug)]
 pub struct Disk {
     name: String,
     format: String,
-    disk_path: String,
     free_space: String,
     max_capacity: String,
+    pub status: DiskStatus
 }
 impl Disk {
-    fn from_disk_list(disks: DiskListType) -> Vec<Disk> {
-        disks
-            .iter()
-            .map(|disk| Disk {
-                name: disk[0].clone(),
-                format: disk[1].clone(),
-                disk_path: disk[2].clone(),
-                free_space: disk[3].clone(),
-                max_capacity: disk[4].clone(),
-            })
-            .collect()
+    /// returns Self + disk_path
+    pub fn from_disk_list(mut disk: Vec<String>) -> (Self, String) {
+        let max_capacity = disk.pop().unwrap();
+        let free_space = disk.pop().unwrap();
+        let disk_path = disk.pop().unwrap();
+        let format = disk.pop().unwrap();
+        let name = disk.pop().unwrap();
+
+        let disk = Disk {
+            max_capacity, free_space, format, name, 
+            status: DiskStatus::Loading
+        };
+
+        (disk, disk_path)
     }
 }
 
 
-
-#[derive(Serialize, Clone, Debug)]
-pub struct CompareDisk {
-    new: Vec<Disk>,
-    deleted: Vec<Disk>
+#[derive(Default)]
+pub struct DisksState {
+    pub disks: FxHashMap<String, Disk>,  
 }
-impl CompareDisk {
-    pub fn compare_disk_list(new_list: &DiskListType, old_list: &DiskListType, app: Arc<tauri::AppHandle>) -> Self {
-        let mut new = DiskListType::new();
-        let mut deleted = DiskListType::new();
+impl DisksState {
+    pub fn update_from_disk_list(&mut self, app_handle: Arc<AppHandle>) {
+        let newest_list = disk_list::get_disk_list();
 
-        // new disks 
-        for disk in new_list {
-            if old_list.iter().any(|x| x[2] == disk[2]) {
+        // new disks
+        for disk in newest_list.iter() {
+            if self.disks.contains_key(&disk[2]) {
                 continue;
             }
-
-            // add new disk
-            new.push(disk.clone());
             
-            // start notify listener
-            let notify_app = Arc::clone(&app);
-            let disk_path2 = disk[2].clone();
+            // add if not contains && noitify
+            let (formatted, path) = Disk::from_disk_list(disk.clone());
+            app_handle
+                .emit_all(GET_OS_DISKS_REPLY_EVENT, (&path, &formatted))
+                .unwrap();
+
+            self.disks.insert(path, formatted);
+
+
+            // start disk change listener
+            let app_handle_cp = Arc::clone(&app_handle);
+            let disk_path = disk[2].clone();
 
             thread::spawn(move || {
-                let path_disk = Path::new(&disk_path2);
-                start_disk_notify(path_disk, notify_app).unwrap();
+                let path_disk = Path::new(&disk_path);
+                start_disk_notify(path_disk, app_handle_cp).unwrap();
             });
 
             // discover disk
             let disk_path = disk[2].clone();
-            let thread_app = Arc::clone(&app);
+            let app_handle_cp = Arc::clone(&app_handle);
 
             thread::spawn(move || {
-                let time_ellapsed = discover_disk(&disk_path).unwrap();
-
-                thread_app
-                    .emit_all(FINISH_DISCOVER_DISK_REPLY_EVENT, (disk_path, time_ellapsed))
-                    .unwrap();
+                match discover_disk(&disk_path) {
+                    Ok(time_ellapsed) => app_handle_cp
+                        .emit_all(FINISH_DISCOVER_DISK_REPLY_EVENT, (disk_path, time_ellapsed))
+                        .unwrap(),
+                    Err(err) => send_err(&err, &app_handle_cp)
+                }
             });
         }
+        //ejected
 
-        // deleted disks
-        for disk in old_list {
-            if new_list.iter().any(|x| x[2] == disk[2]) {
-                continue;
+        self.disks.retain(|path, disk| {
+            if newest_list.iter().any(|d| d[2] == *path) {
+                return true
             }
-    
-            // delete removed disk
-            deleted.push(disk.clone());
 
-            // undiscover disk
-            let disk_path = disk[2].clone();
+            // un-discover if not in newest list            
+            let disk_path = path.clone();
             thread::spawn(move || un_discover_disk(disk_path));
-        }
 
-        CompareDisk {
-            new: Disk::from_disk_list(new),
-            deleted: Disk::from_disk_list(deleted)  
-        }
-    }
+            disk.status = DiskStatus::Ejected;
+            app_handle
+                .emit_all(GET_OS_DISKS_REPLY_EVENT, (path, &disk))
+                .unwrap();
 
-    pub fn len(&self) -> usize {
-        self.new.len() + self.deleted.len()
+            return false
+        });
     }
 }
 
 
-#[tauri::command]
-pub async fn get_os_disks(app: tauri::AppHandle) -> Result<(), ()> {
+lazy_static! {
+    pub static ref DISKS: Mutex<DisksState> = Mutex::new(DisksState::default());
+}
+
+pub fn os_disks_listener(app: AppHandle) {
     thread::spawn(move || {
-        let mut current_disks = DiskListType::new();
-        let app = Arc::new(app);
+        let app_handle = Arc::new(app);
 
         loop {
-            let new_list = disk_list::get_disk_list();
-            let diff = CompareDisk::compare_disk_list(
-                &new_list, 
-                &current_disks,
-                Arc::clone(&app)
-            );
-            if diff.len() > 0 {
-                app.emit_all(GET_OS_DISKS_REPLY_EVENT, diff)
-                .unwrap();
-
-                current_disks = new_list;
+            {
+                let disks = &mut DISKS.lock().unwrap();
+                disks.update_from_disk_list(Arc::clone(&app_handle));
             }
             thread::sleep(Duration::from_secs(1));
         }
     });
-
-    Ok(())
 }
+
+#[tauri::command]
+pub fn get_os_disks() -> Vec<(String, Disk)> {
+    let disks = &DISKS.lock().unwrap();
+    
+    disks.disks.iter()
+        .map(|(a,b)| (a.clone(), b.clone()))
+        .collect()
+}
+

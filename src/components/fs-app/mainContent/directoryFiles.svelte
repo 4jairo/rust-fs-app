@@ -58,7 +58,7 @@
       <p>
         {currPath.isDirectory 
         ? `the folder on ( ${currPath.path} )`
-        : `the search of ${currPath.name} ( ${currPath.path} )`} doesn't have items
+        : `the search of ${currPath.name} ( ${currPath.path || 'all disks'} )`} doesn't have items
       </p>
     </div>
   

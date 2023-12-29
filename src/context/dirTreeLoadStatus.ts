@@ -1,12 +1,12 @@
 import { writable } from 'svelte/store'
 
-const enum Visibility {
+export const enum Visibility {
   invisible = 'invisible',
   visible = 'visible'
 }
 
 const createContext = () => {
-  const { subscribe, update } = writable<{
+  const State = writable<{
     visibleStatus: Visibility
     secondsEllapsed: number
     loadingDisks: string[]
@@ -21,78 +21,74 @@ const createContext = () => {
     __interval: null,
     __tasks: []
   })
-
-  const handleStopInterval = () => {
-    subscribe(state => {
-      if(state.__interval) clearInterval(state.__interval)
-    })()
+ 
+  const handleStartInterval = () => {
+    State.update(prevState1 => ({
+      ...prevState1,
+      secondsEllapsed: prevState1.secondsEllapsed + .1
+    }))
   }
 
-  const handleCloseProgressBar = () => update((prevState) => ({
-    ...prevState,
-    visibleStatus: Visibility.invisible,
-  }))
+  const setModalVisibility = (visibleStatus: Visibility) => {
+    State.update((prevState) => ({
+      ...prevState, visibleStatus
+    }))
+  }
 
-  // show modal
-  const showModal = () => update((prevState) => ({
-    ...prevState,
-    visibleStatus: Visibility.visible
-  }))
-
-  // toggle loading disks
-  const removeLoadingDisk = (diskPath: string) => update((prevState) => {
-    const newLoadingDisks = [...prevState.loadingDisks].filter(d => d !== diskPath)
-    if (newLoadingDisks.length === 0) {
-      handleStopInterval()
-      setTimeout(handleCloseProgressBar, 3000);
-
-      for (const task of prevState.__tasks) task()
-    }
-
-    return {
+  const addLoadingDisk = (diskPath: string) => {
+    State.update(prevState => ({
       ...prevState,
-      loadingDisks: newLoadingDisks,
-      loading: newLoadingDisks.length > 0,
-      __tasks: newLoadingDisks.length > 0
-        ? prevState.__tasks
-        : []
-    }
-  })
+      loadingDisks: [...prevState.loadingDisks].concat(diskPath),
+      loading: true,
+      __interval: prevState.__interval ?? setInterval(handleStartInterval, 100)
+    }))
+  }
+  
+  const removeLoadingDisk = (diskPath: string) => {
+    State.update(prevState => {
+      const newLoadingDisks = [...prevState.loadingDisks].filter(d => d !== diskPath)
 
-  const addLoadingDisk = (diskPath: string) => update((prevState) => ({
-    ...prevState,
-    loadingDisks: [...prevState.loadingDisks].concat(diskPath),
-    loading: true,
-    __interval: prevState.__interval ?? setInterval(() => {
-      update(prevState1 => ({
-        ...prevState1,
-        secondsEllapsed: prevState1.secondsEllapsed + .1
-      }))
-    }, 100)
-  }))
+      if (newLoadingDisks.length === 0) {   
+        if(prevState.__interval) clearInterval(prevState.__interval)
+        
+        setTimeout(() => setModalVisibility(Visibility.invisible), 3000)
+        for (const task of prevState.__tasks) task()
+      }
 
-  const waitUntilAvaliableDirTree = (task: () => void) => update(state => {
-    if (!state.loading) {
-      task()
-      return state
-    } else {
-      return { ...state, __tasks: state.__tasks.concat(task) }
-    }
-  })
-
+      return {
+        ...prevState,
+        loadingDisks: newLoadingDisks,
+        loading: newLoadingDisks.length > 0,
+        __tasks: newLoadingDisks.length > 0
+          ? prevState.__tasks
+          : [],
+        __interval: newLoadingDisks.length > 0
+          ? prevState.__interval
+          : null
+      }
+    })
+  }
+  
+  const waitUntilAvaliableDirTree = (task: () => void) => {
+    State.update(state => {
+      if (!state.loading) {
+        task()
+        return state
+      }
+      
+      return { 
+        ...state, __tasks: state.__tasks.concat(task) 
+      }
+    })
+  }
+  
   return { 
-    subscribe,
+    subscribe: State.subscribe,
     waitUntilAvaliableDirTree,
-    handleCloseProgressBar,
-    showModal,
-    addLoadingDisk,
-    removeLoadingDisk 
+    setModalVisibility,
+    removeLoadingDisk,
+    addLoadingDisk
   }
 }
 
-/**
- * Contains dirTreeLoadBar modal information
- * 
- * Loaded disks && related 
- */
 export const DirTreeLoadContext = createContext()

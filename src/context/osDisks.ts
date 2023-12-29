@@ -1,28 +1,28 @@
 import { writable } from "svelte/store"
-import type { getOsDisksType } from "../tauriApi/tauriApiTypes"
+import type { getOsDisksType2 } from "../tauriApi/tauriApiTypes"
 
 const createContext = () => {
   const { update, subscribe } = writable<{
-    disks: getOsDisksType[]
+    disks: getOsDisksType2[]
   }>({
     disks: []
   })
   
-  const addOsDisks = (disk: getOsDisksType | getOsDisksType[]) => {
+  const addOsDisk = (disk: getOsDisksType2) => {
     update(prevState => ({
       ...prevState,
-      disks: prevState.disks.concat(disk)
+      disks: [...prevState.disks, disk]
     }))
   }
 
   const removeOsDisk = (diskPath: string) => {
     update(prevState => ({
       ...prevState,
-      disks: prevState.disks.filter(d => d.disk_path !== diskPath)
+      disks: prevState.disks.filter(([path]) => path !== diskPath)
     }))
   }
 
-  return { subscribe, addOsDisks, removeOsDisk }
+  return { subscribe, addOsDisk, removeOsDisk }
 }
 
 

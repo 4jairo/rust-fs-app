@@ -11,6 +11,25 @@
         "version": "0.0.0"
     },
     "tauri": {
+        "systemTray": {
+            "iconPath": "icons/icon.ico",
+            "iconAsTemplate": true
+        },
+        "cli": {
+            "args": [
+                {
+                    "name": "headless",
+                    "short": "h",
+                    "takesValue": false
+                },
+                {
+                    "name": "path",
+                    "short": "p",
+                    "maxValues": 1,
+                    "takesValue": true
+                }
+            ]
+        },
         "allowlist": {
             "all": false,
             "path": { "all": true }
@@ -24,16 +43,6 @@
         "security": {
             "csp": null
         }, 
-        "windows": [
-            {
-                "fullscreen": false,
-                "resizable": true,
-                "title": "fs-app",
-                "width": 800,
-                "height": 600,
-                "minWidth": 860,
-                "minHeight": 0
-            }
-        ]
+        "windows": []
     }
 }

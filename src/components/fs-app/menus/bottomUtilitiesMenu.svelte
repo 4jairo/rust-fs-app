@@ -1,14 +1,18 @@
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
+
 <script lang='ts'>
   import Icons from '../../common/icons.svelte'
   import { FileContext } from '../../../context/fileContext';
-  import { openTerminal } from '../../../tauriApi/invokeApi';
+  import { disable, enable, isEnabled } from 'tauri-plugin-autostart-api'
+  import { openTerminal, startOnBootNotify, startOnBootChangeListener } from '../../../tauriApi/invokeApi';
   import { ContainerContext, FileCopyContext } from '../../../context/fileCopyContext';
   import type { EventEv } from '../../common/eventListenerTypes';
   import SelectHoverTheme from './selectHoverTheme.svelte';
   import { PaginationContext } from '../../../context/pagination';
   import { getBarWidth, handleChangeBarWidth } from '../../../hooks/handleResizeBar';
+  import { onDestroy } from 'svelte';
+  import { changeOpenOnBootNotification } from '../../../alerts/alerts';
 
   $: pagination = $PaginationContext
 
@@ -74,22 +78,55 @@
   const updateContainerContext = () => {
     FileCopyContext.updateContainerContext(ContainerContext.Footer)
   }
+
+  // open on boot
+  let openOnBoot = false
+  isEnabled().then(bool => openOnBoot	= bool)
+
+  const changeOpenOnBoot = async () => {
+    const state = await isEnabled()
+    const { isConfirmed, isDenied } = await changeOpenOnBootNotification(state)
+
+    if(isConfirmed) {
+      await enable()
+      await startOnBootNotify(true)
+    }
+    else if(isDenied) {
+      await disable()
+      await startOnBootNotify(false)
+    }
+  }
+
+  const changeOpenOnBootUnlisten = startOnBootChangeListener((e) => {
+    console.log({e})
+    openOnBoot = e.payload
+  })
+
+  onDestroy(() => {
+    changeOpenOnBootUnlisten.then(fn => fn())
+  })
 </script>
 
 <div class='container' on:click={updateContainerContext}>
   <section>
-    <section on:click={() => openTerminal(currentPath)} style="cursor: pointer;" class="hovereable"> 
+    <section on:click={() => openTerminal(currentPath)} style="cursor: pointer;" class="hovereable" title="open a terminal in the current path"> 
       <Icons icon='terminal' size={27}/>
       <p>Terminal</p>
     </section>
 
     <p class="separation">|</p>
-    <section on:click={togglePreVisualization}>
-      <Icons icon={visualization ? 'visualization-fill': 'visualization'} size={24}/>
+    <section on:click={changeOpenOnBoot} title="change open on boot">
+      <Icons icon={openOnBoot ? 'rocket-fill': 'rocket'} size={24}/>
     </section>
 
     <p class="separation">|</p>
-    <section style="cursor: pointer;" class="">
+    <section on:click={togglePreVisualization} title="image previsualization">
+      <Icons icon={visualization ? 'visualization-fill': 'visualization'} size={24}/>
+    </section>
+
+
+    <p class="separation">|</p>
+    <section style="cursor: pointer;" title="change color palette">
       <label>
         {#key mainHoverTheme}
           <SelectHoverTheme changeThemeSelection={() => mainHoverTheme = !mainHoverTheme} {mainHoverTheme}/>

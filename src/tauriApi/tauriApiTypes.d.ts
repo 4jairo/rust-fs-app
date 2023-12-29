@@ -4,14 +4,11 @@ import { CopyRenameRules } from './invokeApi'
 export interface getOsDisksType {
   name: string
   format: string
-  disk_path: string
+  status: 'Loading' | 'Loaded' | 'Ejected'
   free_space: string
   max_capacity: string
 }
-export interface CompareOsDisksType {
-  new: getOsDisksType[],
-  deleted: getOsDisksType[]
-}
+export type getOsDisksType2 = [string, getOsDisksType]
 
 export interface getDirContentType {
   path: string
@@ -29,60 +26,69 @@ export interface ApplicationType {
   uninstall_string: string
   icon: string
 }
-export interface getAllApps {
+export interface getAllAppsType {
   [collectionName: string]: ApplicationType[]
 }
 
 export interface TauriListenerEvent<T> {
   event: string,
   id: number,
-  windowLabel: null,
+  windowLabel: string,
   payload: T
 }
 
 
 
-export interface invokeApi {
+export namespace invokeApi {
+  type error = (cb: (event: TauriListenerEvent<string>) => void) => Promise<UnlistenFn>
+
   //! 1.- disks & dirTree changes
-  osDisksChange: (callback: (newDiskList: TauriListenerEvent<CompareOsDisksType>) => void) => Promise<UnlistenFn> 
+  type osDisksChange = (callback: (newDiskList: TauriListenerEvent<getOsDisksType2[]>) => void) => Promise<UnlistenFn> 
   // not err
 
-  dirTreeChange: (callback: (event: TauriListenerEvent<string>) => void) => Promise<UnlistenFn>
+  type getOsDisks = () => Promise<getOsDisksType2[]>
+  
+
+  type dirTreeChange = (callback: (event: TauriListenerEvent<string>) => void) => Promise<UnlistenFn>
   // not err
   
-  finishedDiscoverDisk: (cb: (e: TauriListenerEvent<[string, number]>) => void) => Promise<UnlistenFn>
+  type finishedDiscoverDisk = (cb: (e: TauriListenerEvent<[string, number]>) => void) => Promise<UnlistenFn>
   // not err
 
   //! 2.- get files/dirs
-  getDirContent: (path: string) => Promise<getDirContentType[]> // -> error -> null
+  type getDirContent = (path: string) => Promise<getDirContentType[]> // -> error -> null
 
-  searchByName: (path: string, fileName: string, onlyAbsolute: boolean) => Promise<getDirContentType[]>
+  type searchByName = (path: string, fileName: string, onlyAbsolute: boolean) => Promise<getDirContentType[]>
 
   //! 3.- modify files/dirs
-  openFile: (filePath: string, administrator?: boolean) => Promise<null> // error -> string
+  type openFile = (filePath: string, administrator?: boolean) => Promise<null> // error -> string
 
-  createFile: (path: string, isFile: boolean) => Promise<null> // error -> string
+  type createFile = (path: string, isFile: boolean) => Promise<null> // error -> string
 
-  renameFile: (fromPath: string, newName: string) => Promise<null> // error -> string
+  type renameFile = (fromPath: string, newName: string) => Promise<null> // error -> string
 
-  moveFile: (file_paths: string[], new_dir: string, copyRules?: CopyRenameRules) => Promise<null> // error -> string
-  copyFile: (file_paths: string[], new_dir: string, copyRules?: CopyRenameRules) => Promise<null> // error -> string
+  type moveFile = (file_paths: string[], new_dir: string, copyRules?: CopyRenameRules) => Promise<null> // error -> string
+  type copyFile = (file_paths: string[], new_dir: string, copyRules?: CopyRenameRules) => Promise<null> // error -> string
 
   //move to trash
 
   //restore
 
   //! 4.- utils (fs) 
-  openTerminal: (path: string) => Promise<null> // error -> string
+  type openTerminal = (path: string) => Promise<null> // error -> string
 
   //open windows fs
 
-  existentFile: (path: string) => Promise<{ is_file: boolean, is_dir: boolean }>
+  type existentFile = (path: string) => Promise<{ is_file: boolean, is_dir: boolean }>
   
-  getPathParent: (path: string) => Promise<string | null> 
+  type getPathParent = (path: string) => Promise<string | null> 
+
+  type startOnBootChangeListener = (cb: (e: TauriListenerEvent<boolean>) => void) =>  Promise<UnlistenFn>
+
+  type startOnBootChange = (newValue: boolean) => Promise<void>
   
   //auto complete
 
   //! apps
-  getAllApps: () => Promise<getAllApps>
+  type getAllApps = () => Promise<getAllAppsType>
 }

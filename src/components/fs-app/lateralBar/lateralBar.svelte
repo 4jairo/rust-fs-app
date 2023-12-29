@@ -34,6 +34,8 @@
     .catch((err) => showErrorAlert(err))
   }
 
+  $: console.log($OsDisksContext.disks)
+
   // used gb's bar on drives
   const usedCapacityPercent = (maxCapacity: string, freeSpace: string) => {
     const parsedMaxCapacity =  Number(maxCapacity.split(' ').shift())
@@ -70,7 +72,7 @@
     <MenuSeparation />
     <h3>· Drives:</h3>
     
-    {#each $OsDisksContext.disks as {disk_path, free_space, max_capacity, name}}
+    {#each $OsDisksContext.disks as [disk_path, { free_space, max_capacity, name }]}
       <button on:click={() => handleClick(name, disk_path)} class={isOnCurrentPath(disk_path) ? 'onCurrentPath' : ''}>
         {name || 'Local disk'} ( {disk_path} )
       </button>

@@ -15,7 +15,8 @@
     "@tauri-apps/api": "^1.4.0",
     "file-extension-icon-js": "^1.1.6",
     "highlight.js": "^11.9.0",
-    "sweetalert2": "^11.7.27"
+    "sweetalert2": "^11.7.27",
+    "tauri-plugin-autostart-api": "github:tauri-apps/tauri-plugin-autostart#v1"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.4.5",

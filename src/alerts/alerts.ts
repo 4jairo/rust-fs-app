@@ -2,6 +2,19 @@ import Swal from 'sweetalert2'
 import '@sweetalert2/theme-dark/dark.css'
 import { CopyRenameRules } from '../tauriApi/invokeApi'
 
+export const changeOpenOnBootNotification = async (currentState: boolean) => {
+  return await Swal.fire({
+    title: 'Confirmation',
+    html: `
+      Do you want to run the application on startup? <br />
+      Current state: <b>${currentState ? 'Enabled' : 'Disabled'}</b>`,
+    icon: 'question',
+    confirmButtonText: 'Yes',
+    showDenyButton: true,
+    denyButtonText: 'No', 
+  })
+}
+
 
 export const existentFileNotification = async (fileName: string) => {
   return await Swal.fire({
@@ -11,7 +24,7 @@ export const existentFileNotification = async (fileName: string) => {
   })
 }
 
-export const waitUntilAvaliableDirTree = async () => {
+export const waitUntilAvaliableDirTreeNotification = async () => {
   return await Swal.fire({
     icon: 'warning',
     title: 'Loading...',

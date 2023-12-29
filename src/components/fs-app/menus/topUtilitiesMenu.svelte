@@ -7,10 +7,10 @@
   import Icons from '../../common/icons.svelte';
   import { WindowLocationContext, WindowLocationTypes } from '../../../context/currentWindowContext';
   import { FileContext } from '../../../context/fileContext'; 
-  import { DirTreeLoadContext } from '../../../context/dirTreeLoadStatus'; 
+  import { DirTreeLoadContext, Visibility } from '../../../context/dirTreeLoadStatus'; 
   import { searchByName } from '../../../tauriApi/invokeApi';
   import { SearchParamsTopMenuFs } from '../../../context/searchParamsTopMenuFs';
-  import { waitUntilAvaliableDirTree } from '../../../alerts/alerts';
+  import { waitUntilAvaliableDirTreeNotification } from '../../../alerts/alerts';
   import { ContainerContext, FileCopyContext } from '../../../context/fileCopyContext';
 
   $: fileContext = $FileContext
@@ -47,11 +47,12 @@
     }
 
     if($DirTreeLoadContext.loading) {
-      (await waitUntilAvaliableDirTree()).isConfirmed
-      ? task()
-      : DirTreeLoadContext.waitUntilAvaliableDirTree(task)
+      const { isConfirmed } = await waitUntilAvaliableDirTreeNotification();
 
-      DirTreeLoadContext.showModal()
+      if(isConfirmed) task()
+      else DirTreeLoadContext.waitUntilAvaliableDirTree(task)
+
+      DirTreeLoadContext.setModalVisibility(Visibility.visible)
     } else {
       task()
     }

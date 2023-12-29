@@ -4,7 +4,7 @@ use notify::event::{ModifyKind, RenameMode};
 use notify::{Config, EventKind, RecommendedWatcher, RecursiveMode, Watcher};
 use std::path::{Path, PathBuf};
 use std::sync::{mpsc, Arc};
-use tauri::Manager;
+use tauri::{Manager, AppHandle};
 
 pub struct DirChangesEvent;
 impl DirChangesEvent {
@@ -34,7 +34,7 @@ impl DirChangesEvent {
     }
 }
 
-pub fn start_disk_notify(disk_path: &Path, app: Arc<tauri::AppHandle>) -> Result<(), notify::Error> {
+pub fn start_disk_notify(disk_path: &Path, app: Arc<AppHandle>) -> Result<(), notify::Error> {
     let (tx, rx) = mpsc::channel();
 
     // Automatically select the best implementation for your platform.

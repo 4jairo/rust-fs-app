@@ -1,10 +1,28 @@
 <script lang='ts'>
   import { onDestroy } from 'svelte';
-  import { DirTreeLoadContext } from '../../../context/dirTreeLoadStatus';
-  import { finishedDiscoverDisk, listenOsDisks } from '../../../tauriApi/invokeApi';
+  import { DirTreeLoadContext, Visibility } from '../../../context/dirTreeLoadStatus';
+  import { finishedDiscoverDisk, getOsDisks, listenOsDisks } from '../../../tauriApi/invokeApi';
   import { OsDisksContext } from '../../../context/osDisks';
+  import type { getOsDisksType2 } from '../../../tauriApi/tauriApiTypes';
   
   $: state = $DirTreeLoadContext
+  
+  const manageDisks = (list: getOsDisksType2[]) => {
+    for (const item of list) {
+      const [diskPath, disk] = item
+
+      if(disk.status === 'Ejected') {
+        DirTreeLoadContext.removeLoadingDisk(diskPath)
+        OsDisksContext.removeOsDisk(diskPath)
+        continue
+      }
+
+      if(disk.status === 'Loading') {
+        DirTreeLoadContext.addLoadingDisk(diskPath)
+      }
+      OsDisksContext.addOsDisk(item)      
+    }
+  }
 
   // get discovered disk confirmation
   const discoveredDiskUnlisten = finishedDiscoverDisk(({ payload }) => {
@@ -12,22 +30,13 @@
     DirTreeLoadContext.removeLoadingDisk(diskPath)
   })
 
-  // get new disks
+  // gets new && deleted drives (listener)
   const newDisksUnlisten = listenOsDisks(({ payload }) => {
-    const { new: newDisks, deleted } = payload
-    
-    for (const { disk_path } of deleted) {
-      OsDisksContext.removeOsDisk(disk_path)
-      DirTreeLoadContext.removeLoadingDisk(disk_path)
-    }
-    
-    for (const disk of newDisks) {
-      OsDisksContext.addOsDisks(disk)
-      if(!state.loadingDisks.includes(disk.disk_path)) {
-        DirTreeLoadContext.addLoadingDisk(disk.disk_path)
-      }
-    }
+    manageDisks(payload)
   })
+
+  // gets os disks
+  getOsDisks().then(manageDisks)
 
   onDestroy(() => {
     newDisksUnlisten.then(fn => fn())
@@ -44,7 +53,7 @@
   <p class='timeCounter'>
     {(state.secondsEllapsed).toFixed(2)}
   </p>
-  <button class='closeProgressBar' on:click={DirTreeLoadContext.handleCloseProgressBar}>
+  <button class='closeProgressBar' on:click={() => DirTreeLoadContext.setModalVisibility(Visibility.invisible)}>
     &#10006;
   </button>
 </div>

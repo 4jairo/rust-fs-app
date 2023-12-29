@@ -10,8 +10,11 @@ export const enum CopyRenameRules {
 }
 
 const enum INVOKE_TYPES {
+  error = 'error_listener',
+
   //! 1.- disks & dirTree changes
-  osDisksChange = 'get_os_disks',
+  osDisksChange = 'os_disks_listener',
+  getOsDisks = 'get_os_disks',
   dirTreeChange = 'dir_tree_change',
   finishedDiscoverDisk = 'finish_discover_disk',
 
@@ -36,22 +39,30 @@ const enum INVOKE_TYPES {
   existentfile = 'existent_file',
   getPathParent = 'get_path_parent',
   getAutoComplete = 'get_autocomplete',
-  //getFrequentFiles = 'get_frequent_files'
+  startOnBootChange = 'start_on_boot_change',
+  startOnBootChangeListener = 'start_on_boot_listener',
 
   //! apps
   getAllApps = 'get_all_apps',
 }
 
-//! 1.- disks & dirTree
-export const listenOsDisks: invokeApi['osDisksChange'] = async (cb) => {
-  //@ts-ignore
-  const listener = await listen(INVOKE_TYPES.osDisksChange, (ev) => cb(ev))
-  await invoke(INVOKE_TYPES.osDisksChange)
 
-  return listener
+export const errorListener: invokeApi.error = async (cb) => {
+  //@ts-ignore
+  return await listen(INVOKE_TYPES.error, cb)
 }
 
-export const listenDirTreeChange: invokeApi['dirTreeChange'] = async (cb) => {
+//! 1.- disks & dirTree
+export const listenOsDisks: invokeApi.osDisksChange = async (cb) => {
+  //@ts-ignore
+  return await listen(INVOKE_TYPES.osDisksChange, cb)
+}
+
+export const getOsDisks: invokeApi.getOsDisks = async () => {
+  return await invoke(INVOKE_TYPES.getOsDisks)
+}
+
+export const listenDirTreeChange: invokeApi.dirTreeChange = async (cb) => {
   try {
     //@ts-ignore
     return await listen(INVOKE_TYPES.dirTreeChange, cb)
@@ -61,17 +72,17 @@ export const listenDirTreeChange: invokeApi['dirTreeChange'] = async (cb) => {
   }
 }
 
-export const finishedDiscoverDisk: invokeApi['finishedDiscoverDisk'] = async (cb) => {
+export const finishedDiscoverDisk: invokeApi.finishedDiscoverDisk = async (cb) => {
   //@ts-ignore
   return await listen(INVOKE_TYPES.finishedDiscoverDisk, cb)
 }
 
 //! 2.- get files/dirs
-export const getDirContent: invokeApi['getDirContent'] = async (path) => {
+export const getDirContent: invokeApi.getDirContent = async (path) => {
   return invoke(INVOKE_TYPES.getDirContent, { path })
 }
 
-export const searchByName: invokeApi['searchByName'] = async (path, fileName, onlyAbsolute) => {
+export const searchByName: invokeApi.searchByName = async (path, fileName, onlyAbsolute) => {
   try {
     return await invoke(INVOKE_TYPES.searchByName, { 
       path, fileName, onlyAbsolute
@@ -84,7 +95,7 @@ export const searchByName: invokeApi['searchByName'] = async (path, fileName, on
 
 
 //! 3.- modify files/dirs
-export const openFile: invokeApi['openFile'] = async (filePath, administrator) => {
+export const openFile: invokeApi.openFile = async (filePath, administrator) => {
   try {
     return await invoke(INVOKE_TYPES.openFile, { filePath, administrator: administrator ?? false })
   } catch (error) {
@@ -93,7 +104,7 @@ export const openFile: invokeApi['openFile'] = async (filePath, administrator) =
   }
 }
 
-export const createFile: invokeApi['createFile'] = async (path, isFile) => {
+export const createFile: invokeApi.createFile = async (path, isFile) => {
   try {
     return await invoke(INVOKE_TYPES.createFile, { path, isFile }) 
   } catch (error) {
@@ -102,7 +113,7 @@ export const createFile: invokeApi['createFile'] = async (path, isFile) => {
   }
 }
 
-export const renameFile: invokeApi['renameFile'] = async (fromPath, newName) => {
+export const renameFile: invokeApi.renameFile = async (fromPath, newName) => {
   try {
     return await invoke(INVOKE_TYPES.renameFile, { from: fromPath, newName })
   } catch (error) {
@@ -111,7 +122,7 @@ export const renameFile: invokeApi['renameFile'] = async (fromPath, newName) => 
   }
 }
 
-export const moveFile: invokeApi['moveFile'] = async (paths, newDir, copyRules) => {
+export const moveFile: invokeApi.moveFile = async (paths, newDir, copyRules) => {
   try {
     return await invoke(INVOKE_TYPES.moveFile, { 
       filePaths: paths, newDir, copyRules: copyRules ?? ''
@@ -122,7 +133,7 @@ export const moveFile: invokeApi['moveFile'] = async (paths, newDir, copyRules) 
   }
 }
 
-export const copyFile: invokeApi['copyFile'] = async (paths, newDir, copyRules) => {
+export const copyFile: invokeApi.copyFile = async (paths, newDir, copyRules) => {
   try {
     return await invoke(INVOKE_TYPES.copyFile, {
       filePaths: paths, newDir, copyRules: copyRules ?? ''
@@ -161,7 +172,7 @@ export const getImgBlob = async (imgPath: string) => {
 
 
 //! 4.- utils (fs)
-export const openTerminal: invokeApi['openTerminal'] = async (path) => {
+export const openTerminal: invokeApi.openTerminal = async (path) => {
   try {
     return await invoke(INVOKE_TYPES.openTerminal, { path })
   } catch (error) {
@@ -170,11 +181,11 @@ export const openTerminal: invokeApi['openTerminal'] = async (path) => {
   }
 }
 
-export const existentFile: invokeApi['existentFile'] = async (path) => {
+export const existentFile: invokeApi.existentFile = async (path) => {
   return await invoke(INVOKE_TYPES.existentfile, { path })
 }
 
-export const getPathParent: invokeApi['getPathParent'] = async (path) => {
+export const getPathParent: invokeApi.getPathParent = async (path) => {
   try {
     return await invoke(INVOKE_TYPES.getPathParent, { path })
   } catch (_) {
@@ -191,8 +202,17 @@ export const getAutoComplete = async (path: string) => {
   return result as string[]
 }
 
+export const startOnBootChangeListener: invokeApi.startOnBootChangeListener = async (cb) => {
+  //@ts-ignore
+  return await listen(INVOKE_TYPES.startOnBootChangeListener, cb)
+}
+
+export const startOnBootNotify: invokeApi.startOnBootChange = async (newValue) => {
+  await invoke(INVOKE_TYPES.startOnBootChange, { newValue })
+}
+
 //! apps
-export const getAllApps: invokeApi['getAllApps'] = async () => {
+export const getAllApps: invokeApi.getAllApps = async () => {
   try {
     return await invoke(INVOKE_TYPES.getAllApps)
   } catch (error) {
@@ -200,9 +220,3 @@ export const getAllApps: invokeApi['getAllApps'] = async () => {
     return {}
   }
 }
-
-
-
-// export const getFrequentFiles: invokeApi['getFrequentFiles'] = async () => {
-//   return await invoke(INVOKE_TYPES.getFrequentFiles)
-// }
