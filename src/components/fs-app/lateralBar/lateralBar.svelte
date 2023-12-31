@@ -12,6 +12,7 @@
   import { handleResizeBar } from '../../../hooks/handleResizeBar';
   import type { MouseEv } from '../../common/eventListenerTypes';
   import { ContainerContext, FileCopyContext } from '../../../context/fileCopyContext';
+  import { getBytes } from '../../../hooks/useFormattedByteSize';
  
   $: fileContextHistory = $FileContext.history
   $: currentPath = fileContextHistory.paths[fileContextHistory.currentPath]
@@ -34,12 +35,11 @@
     .catch((err) => showErrorAlert(err))
   }
 
-  $: console.log($OsDisksContext.disks)
-
   // used gb's bar on drives
   const usedCapacityPercent = (maxCapacity: string, freeSpace: string) => {
-    const parsedMaxCapacity =  Number(maxCapacity.split(' ').shift())
-    const parsedFreeSpace = Number(freeSpace.split(' ').shift())
+    const parsedMaxCapacity = getBytes(maxCapacity)
+    const parsedFreeSpace = getBytes(freeSpace)
+
     return (parsedMaxCapacity - parsedFreeSpace) * 100 / parsedMaxCapacity
   }
 
