@@ -13,6 +13,9 @@
   import RClickMenu from './RClickMenu.svelte';
   import { ContainerContext, FileCopyContext } from '../../../context/fileCopyContext';
   import { showErrorAlert } from '../../../alerts/alerts';
+  import type { MouseEv } from '../../common/eventListenerTypes';
+  import { ShortcutKeysContext } from '../../../context/shortcutKey';
+  import { selectFilesBox } from '../../../hooks/setFilesBox';
 
   $: rClickMenu = $RClickMenuContextFs
   
@@ -43,6 +46,14 @@
     FileCopyContext.updateContainerContext(ContainerContext.DirectoryFiles)
   }
 
+  const handleSelectFiles = async (e: MouseEv<HTMLDivElement>) => {
+    const ctrlPressed = $ShortcutKeysContext.keys.includes('control')
+    if(!ctrlPressed) FileCopyContext.updateFileSelection([])
+
+    const pathSelection = await selectFilesBox(e)
+    FileCopyContext.updateFileSelection(pathSelection, ctrlPressed)
+  }
+
   onDestroy(() => unlistenDirTreeChange.then(fn => fn()))
 </script>
 
@@ -54,6 +65,8 @@
   {#key fileContext}
     <DirectoryFiles {currPath}/>
   {/key}
+
+  <div class="flex-grow" on:mousedown={handleSelectFiles}></div>
 </div>
 
 
@@ -69,6 +82,12 @@
     width: var(--mainContentWidth);
     height: var(--mainContentHeight);
     position: relative;
-    overflow: auto
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .flex-grow {
+    flex-grow: 1;
   }
 </style>

@@ -69,9 +69,8 @@ new Promise<string[]>((resolve) => {
     }
     
     selectedFiles = handlePathSelection(
-      bottomX + parentElmt.offsetLeft - parentElmt.scrollLeft,
+      bottomX + parentElmt.offsetLeft - parentElmt.scrollLeft, 
       bottomY + parentElmt.offsetTop - parentElmt.scrollTop,
-      topX + parentElmt.offsetLeft - parentElmt.scrollLeft,
       topY + parentElmt.offsetTop - parentElmt.scrollTop
     )
     FileCopyContext.updateTempFiles(selectedFiles)
@@ -119,14 +118,14 @@ export function getCurrPagePaths() {
     .map(elmt => elmt.getAttribute('data-path') as string)
 }
 
-function handlePathSelection(bottomX: number, bottomY: number, topX: number, topY: number) {
+function handlePathSelection(bottomX: number, bottomY: number, topY: number) {
   const selectedPaths: string[] = []
 
   for (const rowItem of getAllPageRows()) {
     const rowFilePath = rowItem.getAttribute('data-path')!
     const { top, left, bottom } = rowItem.getBoundingClientRect()
 
-    if((top <= bottomY && bottom >= topY) && (left <= bottomX && left >= topX)) {
+    if(top <= bottomY && bottom >= topY && left <= bottomX) {
       selectedPaths.push(rowFilePath)
     }
   }
