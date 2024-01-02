@@ -25,5 +25,3 @@ export function getBytes(value: string) {
 
   return parsedNum
 }
-
-console.log(getBytes('1.6 TB'))
