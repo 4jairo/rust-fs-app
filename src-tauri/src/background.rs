@@ -27,6 +27,7 @@ pub fn new_window<R: Runtime>(visible: bool, manager: &impl Manager<R>) -> Windo
         .min_inner_size(860.0, 0.0)
         .center()
         .focused(true)
+        .additional_browser_args("--disable-features=ElasticOverscroll")
         .build()
         .unwrap()
 }
