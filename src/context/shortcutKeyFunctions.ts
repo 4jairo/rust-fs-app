@@ -139,6 +139,13 @@ const keyShortcutsFs: keyShortcutsType[] = [
     }
   },
   {
+    keys: ['control', 's'],
+    fn: () => {
+      const serchInputElmt = document.getElementById('searchFilesInput-fs') as HTMLInputElement
+      serchInputElmt.focus()
+    }
+  },
+  {
     keys: ['f5'],
     fn: refreshFn
   },

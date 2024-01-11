@@ -152,6 +152,7 @@
       <div>
         <input 
           type='text' name='input' placeholder='Search files...' 
+          id="searchFilesInput-fs"
           bind:value={searchParamsContext.searchQuery}
           on:input={(e) => SearchParamsTopMenuFs.updateSearchQuery(e.currentTarget.value)}
         />
