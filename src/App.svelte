@@ -2,7 +2,7 @@
   import { FileContext } from './context/fileContext'
   import { errorListener, existentFile, getAllApps, getDirContent, getPathParent } from './tauriApi/invokeApi'
   import { homeDir, resolve } from '@tauri-apps/api/path'
-  import { getMatches } from '@tauri-apps/api/cli'
+  import { appWindow } from '@tauri-apps/api/window'
   import { onDestroy, onMount } from 'svelte'
   import { WindowLocationContext, WindowLocationTypes } from './context/currentWindowContext'
   import { AppsContext } from './context/appsContext'
@@ -22,6 +22,7 @@
   import MainContentApps from './components/apps/mainContent/mainContentApps.svelte'
   import LateralBarApps from './components/apps/menus/lateralBar.svelte'
   import TopUtilitiesMenuApps from './components/apps/menus/topUtilitiesMenu.svelte'
+  import { useSplitPath } from './hooks/useSplitPath';
 
   const parseCliPath = async (path: string) => {
     const absolutePath = await resolve(path)
@@ -32,14 +33,19 @@
 
       if(parent) {
         FileCopyContext.updateFileSelection([absolutePath])
-        return parent
+        const name = useSplitPath(parent).pop()!
+        return { path: parent, name }
       }
     }
     else if(existent.is_dir) {
-      return absolutePath
+      const name = useSplitPath(absolutePath).pop()!
+      return { path: absolutePath, name }
     }
     
-    return await homeDir()
+    return {
+      path: await homeDir(),
+      name: 'Home'
+    }
   }
 
   let loading = true
@@ -52,16 +58,19 @@
 
     try {
       // getting 1st path (cli arg || homeDir)
-      const matches = await getMatches()
-      const initialPath = typeof matches.args.path?.value === 'string'
-        ? await parseCliPath(matches.args.path.value)
-        : await homeDir()
+      const windowInitialName = await appWindow.title()
+      const initial = windowInitialName
+        ? await parseCliPath(windowInitialName)
+        : {
+          path: await homeDir(),
+          name: 'Home'
+        }
 
       FileContext.addDirToHistory({
-        fileList: await getDirContent(initialPath),
+        fileList: await getDirContent(initial.path),
         isDirectory: true,
-        name: 'Home',
-        path: initialPath
+        name: initial.name,
+        path: initial.path
       })
     
       // getting all apps

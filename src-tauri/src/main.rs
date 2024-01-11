@@ -5,7 +5,7 @@
 mod background;
 mod fs_app;
 mod remove_app;
-mod start_on_boot;
+mod window_events;
 
 use fs_app::{
     get_dir_content::{get_dir_content, search_by_name}, 
@@ -17,8 +17,8 @@ use fs_app::{
 use remove_app::get_reg_content::{get_all_apps, search_app_reg};
 use remove_app::launch_app::launch_app;
 
-use start_on_boot::start_on_boot_change;
-use background::{system_tray_menu, system_tray_event_handler, handle_cli_commands, window_event_handler, show_hidden_or_new_window};
+use window_events::{start_on_boot_change, set_window_title};
+use background::{system_tray_menu, system_tray_event_handler, handle_cli_commands, window_event_handler, handle_cli_from_argv};
 
 use tauri_plugin_autostart::{init as init_on_boot, MacosLauncher};
 use tauri_plugin_single_instance::init as single_instance;
@@ -42,10 +42,10 @@ fn main() -> tauri::Result<()> {
 
         // init on booot plugin (--headless | -h only runs the backend)
         .plugin(init_on_boot(MacosLauncher::LaunchAgent, Some(vec!["-h"])))
-
+        
         // single backend instance plugin
-        .plugin(single_instance(|app, _argv, _cwd| {
-            show_hidden_or_new_window(app)
+        .plugin(single_instance(|app, argv, _cwd| {
+            handle_cli_from_argv(app, argv)
         }))
 
         // handlers, ...
@@ -76,6 +76,7 @@ fn main() -> tauri::Result<()> {
             existent_file,
             get_path_parent,
             start_on_boot_change,
+            set_window_title,
             
             //? apps
             search_app_reg,

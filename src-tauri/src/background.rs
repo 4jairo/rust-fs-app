@@ -1,5 +1,4 @@
 use std::time::{UNIX_EPOCH, SystemTime};
-
 use tauri::{
     SystemTrayMenu, SystemTray, SystemTrayMenuItem, SystemTrayEvent, CustomMenuItem,
     App, AppHandle, Manager, 
@@ -11,7 +10,7 @@ use tauri::{
 use tauri::api::cli::ArgData;
 use serde_json::Value;
 
-pub fn new_window<R: Runtime>(visible: bool, manager: &impl Manager<R>) -> Window<R> {
+pub fn new_window<R: Runtime>(visible: bool, manager: &impl Manager<R>, path: Option<&str>) -> Window<R> {
     let label = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .unwrap()
@@ -22,7 +21,7 @@ pub fn new_window<R: Runtime>(visible: bool, manager: &impl Manager<R>) -> Windo
         .visible(visible)
         .fullscreen(false)
         .resizable(true)
-        .title("fs-app")
+        .title(path.unwrap_or("fs-app"))
         .inner_size(800.0, 600.0)
         .min_inner_size(860.0, 0.0)
         .center()
@@ -32,7 +31,7 @@ pub fn new_window<R: Runtime>(visible: bool, manager: &impl Manager<R>) -> Windo
         .unwrap()
 }
 
-pub fn show_hidden_or_new_window<R: Runtime>(manager: &impl Manager<R>) {
+pub fn show_hidden_or_new_window<R: Runtime>(manager: &impl Manager<R>, path: Option<&str>) {
     let mut create_new_window = true;
     for win in manager.windows().values() {
         if !win.is_visible().unwrap() {
@@ -42,7 +41,7 @@ pub fn show_hidden_or_new_window<R: Runtime>(manager: &impl Manager<R>) {
     }
 
     if create_new_window {
-        new_window(true, manager);
+        new_window(true, manager, path);
     }
 }
 
@@ -61,7 +60,7 @@ pub fn system_tray_menu() -> SystemTray {
 pub fn system_tray_event_handler(app: &AppHandle, event: SystemTrayEvent) {
     if let SystemTrayEvent::MenuItemClick { id, .. } = event {
         match id.as_str() {
-            "new" => show_hidden_or_new_window(app),
+            "new" => show_hidden_or_new_window(app, None),
             "quit" => app.exit(0),
             _ => ()
         }
@@ -75,7 +74,7 @@ pub fn window_event_handler(event: GlobalWindowEvent) {
             let app_handle = window.app_handle(); 
 
             if window.windows().len() == 1 {
-                new_window(false, &app_handle);
+                new_window(false, &app_handle, None);
             }
              
             window.close().unwrap();
@@ -98,9 +97,39 @@ pub fn handle_cli_commands<T>(app: &mut App) -> Result<(), T> {
         };
 
         if !headless_app {
-            new_window(true, app);
+            let start_path = match matches.args.get("path") {
+                Some(ArgData { value, .. }) => 
+                    match value {
+                        Value::String(path) => Some(path.as_str()),
+                        _ => None
+                    },
+                None => None
+            };
+        
+            new_window(true, app, start_path);
         }
     }
 
     Ok(())
+}
+
+pub fn handle_cli_from_argv(handle: &AppHandle, argv: Vec<String>) {
+    let mut is_path_value = false;
+
+    for arg in argv {
+        if arg == "-h" || arg == "--headless" {
+            return;
+        }
+        
+        if is_path_value {
+            show_hidden_or_new_window(handle, Some(&arg));
+            return;
+        }
+
+        if arg == "-p" || arg == "--path" {
+            is_path_value = true
+        } 
+    }
+    
+    show_hidden_or_new_window(handle, None);
 }

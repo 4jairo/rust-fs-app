@@ -41,6 +41,7 @@ const enum INVOKE_TYPES {
   getAutoComplete = 'get_autocomplete',
   startOnBootChange = 'start_on_boot_change',
   startOnBootChangeListener = 'start_on_boot_listener',
+  setWindowTitle = 'set_window_title',
 
   //! apps
   getAllApps = 'get_all_apps',
@@ -209,6 +210,14 @@ export const startOnBootChangeListener: invokeApi.startOnBootChangeListener = as
 
 export const startOnBootNotify: invokeApi.startOnBootChange = async (newValue) => {
   await invoke(INVOKE_TYPES.startOnBootChange, { newValue })
+}
+
+export const setWindowTitle = async (path: string, name: string) => {
+  const title = path && name
+    ? `(${name}) ${path}`
+    : path || `🔍(${name})`
+
+  await invoke(INVOKE_TYPES.setWindowTitle, { title })
 }
 
 //! apps

@@ -1,7 +1,7 @@
 import { get, writable } from 'svelte/store'
 import type { getDirContentType } from '../tauriApi/tauriApiTypes'
 import { useLimitedArraySize } from '../hooks/useLimitedArraySize'
-import { getDirContent } from '../tauriApi/invokeApi'
+import { getDirContent, setWindowTitle } from '../tauriApi/invokeApi'
 import { showErrorAlert } from '../alerts/alerts'
 
 type CommomWindowFiltersPath = {
@@ -58,7 +58,9 @@ const createFileContext = () => {
       
       const filterFileExtElmt = document.getElementById('fileExtFilter-fs') as HTMLSelectElement
       filterFileExtElmt.value = ''
+      
 
+      setWindowTitle(paths[newCurrentPathIndex].path, paths[newCurrentPathIndex].name)
       Store.update((state) => ({
         filesExt: '',
         history: {
@@ -85,6 +87,7 @@ const createFileContext = () => {
         ...(!isDirectory && { fileList })
       }], 20)
 
+      setWindowTitle(path, name)
       return {
         history: {
           paths: newPaths,
