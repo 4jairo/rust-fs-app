@@ -8,19 +8,23 @@
 
   // keyboard shortcuts
   const handleKeyDown = (e: KeyboardEvent) => {
-    //console.log(e.key)
+    const key = e.key.toLocaleLowerCase()
 
-    if(e.key === 'F12') return
-    if(e.altKey || (e.ctrlKey && e.key === 'f')) e.preventDefault() 
+    //if(key === 'F12') return
+    if(
+      e.altKey || 
+      (e.ctrlKey && ['f', 'r', 'u'].includes(key)) ||
+      ['f5', 'f3'].includes(key)
+    ) e.preventDefault()
 
-    ShortcutKeysContext.addKey(e.key.toLowerCase())
+    ShortcutKeysContext.addKey(key)
 
     const shortcutData = findKeyCombination($ShortcutKeysContext.keys, windowContext)
     if (shortcutData) shortcutData.fn()
   }
 
-  const handleKeyUp = (e: KeyboardEvent) => {
-    ShortcutKeysContext.removeKey(e.key.toLowerCase())
+  const handleKeyUp = (ev: KeyboardEvent) => {
+    ShortcutKeysContext.removeKey(ev.key.toLowerCase())
   }
 
   onMount(() => {

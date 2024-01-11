@@ -92,7 +92,7 @@
 {:else}
   <InitKeyboardShortcut />
 
-  <main style={getDisplayStatus(WindowLocationTypes.fs)} class='root'>
+  <main style={getDisplayStatus(WindowLocationTypes.fs)} class='root' on:contextmenu|preventDefault>
     <DirTreeLoadBarFs />
     <TopUtilitiesMenuFs />
     <PathMenuFs />
@@ -104,7 +104,7 @@
     <BottomUtilitiesMenuFs />
   </main>
 
-  <main style={getDisplayStatus(WindowLocationTypes.apps)} class='root'>
+  <main style={getDisplayStatus(WindowLocationTypes.apps)} class='root' on:contextmenu|preventDefault>
     <TopUtilitiesMenuApps />
     <div class='mainContentContainer'>
       <LateralBarApps />

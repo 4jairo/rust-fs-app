@@ -1,11 +1,12 @@
 import { getCurrPagePaths } from "../hooks/setFilesBox";
 import { FileContext } from "./fileContext";
 import { FileOperationTypes, FileCopyContext, FileActionTypes, ContainerContext } from "./fileCopyContext";
-import { existentFile } from "../tauriApi/invokeApi";
+import { existentFile, getDirContent, searchByName } from "../tauriApi/invokeApi";
 import { useSplitPath } from "../hooks/useSplitPath";
 import { WindowLocationTypes } from "./currentWindowContext";
 import { get } from "svelte/store";
 import { PreVisualizationContext } from "./preVisualization";
+import { SearchParamsTopMenuFs } from "./searchParamsTopMenuFs";
 
 // type keyShortcutsType = {
 //   keys: string[],
@@ -13,6 +14,19 @@ import { PreVisualizationContext } from "./preVisualization";
 //   { currentPathDependent: true, fn: (currPath: string) => void } |
 //   { currentPathDependent?: false, fn: () => void }
 // )
+
+const refreshFn = async () => {
+  const { history } = get(FileContext)
+  const { absoluteName } = get(SearchParamsTopMenuFs)
+
+  const currPath = history.paths[history.currentPath]
+  
+  const files = currPath.isDirectory
+    ? await getDirContent(currPath.path)
+    : await searchByName(currPath.path, currPath.name, absoluteName)
+  FileContext.updateFileListOnCurrentDir(files)
+}
+
 
 type keyShortcutsType = {
   keys: string[],
@@ -123,6 +137,14 @@ const keyShortcutsFs: keyShortcutsType[] = [
       const filterInputElmnt = document.getElementById('filterQueryFilter-fs') as HTMLInputElement
       filterInputElmnt.focus()
     }
+  },
+  {
+    keys: ['f5'],
+    fn: refreshFn
+  },
+  {
+    keys: ['control', 'r'],
+    fn: refreshFn
   }
 ]
 
