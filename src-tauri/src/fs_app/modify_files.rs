@@ -238,9 +238,11 @@ pub async fn rename_file(from: &str, new_name: &str) -> Result<(), String> {
 
 #[tauri::command]
 pub fn get_file_content(file_path: &str) -> Result<String, String> {
-    Ok(
-        fs::read_to_string(file_path).map_err(stringify)?
-    )
+    let content = fs::read_to_string(file_path).map_err(stringify)?;
+    if content.len() > 5_000_000 {
+        return Err("This file content exceeds the 5MB limit".to_string());
+    }
+    Ok(content)
 }
 
 #[tauri::command]

@@ -115,10 +115,14 @@ export const getUserInputAlert = async (props: GetUserInput) => {
       Swal.showValidationMessage('You mut enter something');
     },
     inputValidator: (inputValue) => {
-      const includesInvalidChars = /[<>\\\/|':?*]/.test(inputValue)
+      if(props.inputValue === inputValue) {
+        return `Invalid name: Same value as before`
+      }
+
+      const includesInvalidChars = /[<>\\\/|"':?*]/.test(inputValue)
       if(includesInvalidChars) {
-        const markedInvalidChars =  inputValue.replace(/[<>\\\/|':?*]/g, (char) => `<b>${char}</b>`)
-        return `Invalid characters detected: ${markedInvalidChars}`
+        const markedInvalidChars = inputValue.replace(/[<>\\\/|':?*]/g, (char) => `<b style="color: red">${char}</b>`)
+        return `Invalid characters detected: '${markedInvalidChars}'`
       }
     }
   })
