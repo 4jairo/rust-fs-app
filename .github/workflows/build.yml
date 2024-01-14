@@ -32,10 +32,10 @@ jobs:
 
       - name: Install Rust deps
         run: | 
-          cd rust-fs-app/src-tauri/
+          cd src-tauri/
           cargo build --release
 
       - name: Build tauri app
         run: |
-          cd rust-fs-app/
+          cd ..
           npm run tauri build -- --release
