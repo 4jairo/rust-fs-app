@@ -1,4 +1,4 @@
-name: Builds the fs-app release binary
+name: Builds the release binary
 
 on:
   push:
