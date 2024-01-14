@@ -22,18 +22,23 @@ jobs:
         with:
           node-version: 18.18.0
 
+      - name: Set up Pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.8.0
+
       - name: Install Node.js deps
-        run: npm i
+        run: pnpm i
     
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
 
-      - name: Install Rust deps
-        run: | 
-          cd src-tauri/
-          cargo build --release
+#      - name: Install Rust deps
+#        run: | 
+#          cd src-tauri/
+#          cargo build --release
 
-      - name: Build tauri app
-        run: npm run tauri build -- --release
+      - name: Build tauri app (installs rust deps)
+        run: pnpm tauri build
