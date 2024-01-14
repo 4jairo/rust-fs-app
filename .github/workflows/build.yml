@@ -42,3 +42,19 @@ jobs:
 
       - name: Build tauri app (installs rust deps)
         run: pnpm tauri build
+
+      - name: Create Github Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: v${{ github.run_number }}
+          draft: false
+          prerelease: true
+
+      - name: Upload Release asset
+        uses: actions/upload-release-asset@v1
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          asset_path: src-tauri/target/release/fs-app.exe
+          asset_name: fs-app.exe
+          asset_content_type: application/octet-stream
