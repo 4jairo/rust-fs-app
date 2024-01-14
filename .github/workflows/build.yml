@@ -36,6 +36,4 @@ jobs:
           cargo build --release
 
       - name: Build tauri app
-        run: |
-          cd ..
-          npm run tauri build -- --release
+        run: npm run tauri build -- --release
