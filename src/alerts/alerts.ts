@@ -92,7 +92,7 @@ export const duplicatePathAlert = async (paths: string[]) => {
 export const showErrorAlert = async (error: string) => {
   return await Swal.fire({
     icon: 'error',
-    title: 'Something happened',
+    title: 'Something happened!',
     html: error
   })
 }

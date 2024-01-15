@@ -2,6 +2,41 @@ use std::process::Command;
 
 use super::error_format::stringify;
 
+// struct OpenTerminal<'a> {
+//     exe: &'a str,
+//     args: Vec<String>,
+// }
+
+// #[tauri::command]
+// pub async fn open_terminal(path: &str) -> Result<(), String> {
+//     let program = match !Command::new("cmd")
+//         .args(["/c", "where wt"])
+//         .output()
+//         .map_err(stringify)?
+//         .status
+//         .success()
+//     {
+//         true => OpenTerminal{ 
+//             exe: "wt", 
+//             args: vec!["-d".to_string(), path.to_string()] 
+//         },
+//         false => OpenTerminal{ 
+//             exe: "powershell", 
+//             args: vec!["-noexit".to_string(), "-command".to_string(), format!(r#"{{cd "{}"}}"#, path)] 
+//         }
+//     };
+
+//     let output = Command::new(program.exe)
+//         .args(program.args)
+//         .output()
+//         .map_err(stringify)?;
+
+//     match output.status.success() {
+//         true => Ok(()),
+//         false => Err(String::from_utf8_lossy(&output.stderr).to_string())
+//     }
+// }
+
 #[tauri::command]
 pub async fn open_terminal(path: &str) -> Result<(), String> {
 

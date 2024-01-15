@@ -47,7 +47,6 @@ const enum INVOKE_TYPES {
   getAllApps = 'get_all_apps',
 }
 
-
 export const errorListener: invokeApi.error = async (cb) => {
   //@ts-ignore
   return await listen(INVOKE_TYPES.error, cb)
@@ -60,7 +59,12 @@ export const listenOsDisks: invokeApi.osDisksChange = async (cb) => {
 }
 
 export const getOsDisks: invokeApi.getOsDisks = async () => {
-  return await invoke(INVOKE_TYPES.getOsDisks)
+  try {    
+    return await invoke(INVOKE_TYPES.getOsDisks)
+  } catch (error) {
+    await showErrorAlert(error as string)
+    return []
+  }
 }
 
 export const listenDirTreeChange: invokeApi.dirTreeChange = async (cb) => {
@@ -146,11 +150,19 @@ export const copyFile: invokeApi.copyFile = async (paths, newDir, copyRules) => 
 }
 
 export const restoreLastDeletedFile = async () => {
-  return await invoke(INVOKE_TYPES.restoreLastDeletedFile)
+  try {
+    return await invoke(INVOKE_TYPES.restoreLastDeletedFile)
+  } catch (error) {
+    await showErrorAlert('restoring the latest deleted file failed, try with the Windows explorer app')
+  }
 }
 
 export const moveToTrash = async (paths: string[]) => {
-  return await invoke(INVOKE_TYPES.moveToTrash, { paths })
+  try {
+    await invoke(INVOKE_TYPES.moveToTrash, { paths })
+  } catch (error) {
+    await showErrorAlert(error as string)
+  }
 }
 
 export const getFileContent = async (filePath: string) => {

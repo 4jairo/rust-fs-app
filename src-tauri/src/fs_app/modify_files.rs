@@ -77,8 +77,10 @@ fn copy_file_inner(file_paths: Vec<PathBuf>, new_dir: PathBuf, config: &CopyMove
             if fs::create_dir(&new_path).is_err() {
                 match config {
                     CopyMoveRules::CreateNewName => rename_existent_file(&new_dir, &mut new_path)?,
-                    CopyMoveRules::Skip => continue,
-                    CopyMoveRules::OverWrite => fs::remove_dir_all(&new_path)?
+                    CopyMoveRules::OverWrite if new_path != path => {
+                        fs::remove_dir_all(&new_path)?
+                    },
+                    _ => continue,
                 }
                 fs::create_dir(&new_path)?;
             }
