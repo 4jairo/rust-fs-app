@@ -17,7 +17,7 @@ const createContext = () => {
     visibleStatus: Visibility.invisible,
     secondsEllapsed: 0,
     loadingDisks: [],
-    loading: true,
+    loading: false,
     __interval: null,
     __tasks: []
   })

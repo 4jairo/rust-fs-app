@@ -127,7 +127,7 @@ const keyShortcutsFs: keyShortcutsType[] = [
     fn: () => {
       const { containerContext } = get(FileCopyContext)
       if(containerContext === ContainerContext.PreVisualization) {
-        PreVisualizationContext.update(prev => ({ ...prev, altZ: !prev.altZ }))
+        PreVisualizationContext.toggleAltZ()
       }
     }
   },

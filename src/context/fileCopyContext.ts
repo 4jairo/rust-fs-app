@@ -6,6 +6,7 @@ import { join } from "@tauri-apps/api/path"
 import { FileContext } from "./fileContext"
 import { handleOpenFolder } from "../hooks/hanldeOpenFolder"
 import { handleAutoScroll } from "../hooks/setFilesBox"
+import { ITEMS_PER_PAGE, PaginationContext } from "./pagination"
 
 export const enum FileOperationTypes {
   Copy,
@@ -219,21 +220,30 @@ const createContext = () => {
         return { ...prevState, selectedFilesPath: [fileList[0].path] }
       }
       
-      // +1 selected pahts
-      const lastSelectedPath = prevState.selectedFilesPath[prevState.selectedFilesPath.length -1]
-      const selectedPathIndex = fileList.findIndex(p => p.path === lastSelectedPath)
+      // (1 || +1) selected pahts
+      const selectedPath = prevState.selectedFilesPath[isKeyUp ? 0 : prevState.selectedFilesPath.length -1]
+      const selectedPathIndex = fileList.findIndex(p => p.path === selectedPath)
 
       if(selectedPathIndex === -1) {
         handleAutoScroll(fileList[0].path)
         return { ...prevState, selectedFilesPath: [fileList[0].path] }
       }
 
-      // path in current dir
+
+      // if path in current dir (doesn't touch fileList borders)
       if(
         (!isKeyUp && fileList.length -1 === selectedPathIndex) ||
         (isKeyUp && selectedPathIndex === 0)
       ) return prevState
+
       
+      // if newPath is in next/prev page
+      const currPage = Math.floor(selectedPathIndex / ITEMS_PER_PAGE)
+      const newPathPage = Math.floor((selectedPathIndex + ammount) / ITEMS_PER_PAGE)
+      if(currPage !== newPathPage) {
+        PaginationContext.travelPagination(ammount)
+      }
+
       const newPath = fileList[selectedPathIndex + ammount].path
       handleAutoScroll(newPath)
       return { ...prevState, selectedFilesPath: [newPath]}

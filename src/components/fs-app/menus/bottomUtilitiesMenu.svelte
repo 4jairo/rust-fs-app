@@ -13,6 +13,7 @@
   import { getBarWidth, handleChangeBarWidth } from '../../../hooks/handleResizeBar';
   import { onDestroy } from 'svelte';
   import { changeOpenOnBootNotification } from '../../../alerts/alerts';
+  import { PreVisualizationContext } from '../../../context/preVisualization';
 
   $: pagination = $PaginationContext
 
@@ -63,10 +64,11 @@
   }
 
   //files pre-visualization
-  let visualization = getBarWidth('--previsualizationWidth') > 0
+  PreVisualizationContext.setVisibility(getBarWidth('--previsualizationWidth') > 0)
+  
   const togglePreVisualization = () => {
     const isVisible = getBarWidth('--previsualizationWidth') > 0
-    visualization = !isVisible
+    PreVisualizationContext.setVisibility(!isVisible)
 
     if(isVisible) {
       handleChangeBarWidth('--previsualizationWidth', 0)
@@ -98,7 +100,6 @@
   }
 
   const changeOpenOnBootUnlisten = startOnBootChangeListener((e) => {
-    console.log({e})
     openOnBoot = e.payload
   })
 
@@ -121,7 +122,7 @@
 
     <p class="separation">|</p>
     <section on:click={togglePreVisualization} title="image previsualization">
-      <Icons icon={visualization ? 'visualization-fill': 'visualization'} size={24}/>
+      <Icons icon={$PreVisualizationContext.visible ? 'visualization-fill': 'visualization'} size={24}/>
     </section>
 
 

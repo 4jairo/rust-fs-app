@@ -143,7 +143,7 @@ export function handleAutoScroll(path: string) {
   const containerElmt = document.getElementById('mainContent-fs-parent') as HTMLDivElement
 
   const rowPosition = rowElement.offsetTop - containerElmt.offsetTop
-  const centerDiff = (containerElmt.clientHeight - rowElement.clientHeight) / 3
+  const centerDiff = (containerElmt.clientHeight - rowElement.clientHeight) / 4
 
   containerElmt.scrollTop = rowPosition - centerDiff
 }

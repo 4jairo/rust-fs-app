@@ -28,7 +28,7 @@
   let fileContent = { content: '', ok: true, isImage: false }
   $: currentPath = $FileCopyContext.selectedFilesPath[0]
   
-  $: if (currentPath) {
+  $: if (currentPath && preVisContext.visible) {
     (async () => {
       const existentPath = await existentFile(currentPath)
       if(existentPath.is_dir) return

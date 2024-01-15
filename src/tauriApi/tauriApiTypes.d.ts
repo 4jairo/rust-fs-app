@@ -43,7 +43,7 @@ export namespace invokeApi {
   type error = (cb: (event: TauriListenerEvent<string>) => void) => Promise<UnlistenFn>
 
   //! 1.- disks & dirTree changes
-  type osDisksChange = (callback: (newDiskList: TauriListenerEvent<getOsDisksType2[]>) => void) => Promise<UnlistenFn> 
+  type osDisksChange = (callback: (newDiskList: TauriListenerEvent<getOsDisksType2>) => void) => Promise<UnlistenFn> 
   // not err
 
   type getOsDisks = () => Promise<getOsDisksType2[]>

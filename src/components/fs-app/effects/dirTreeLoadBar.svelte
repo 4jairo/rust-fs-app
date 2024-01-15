@@ -20,7 +20,7 @@
       if(disk.status === 'Loading') {
         DirTreeLoadContext.addLoadingDisk(diskPath)
       }
-      OsDisksContext.addOsDisk(item)      
+      OsDisksContext.addOsDisk(item)  
     }
   }
 
@@ -32,10 +32,10 @@
 
   // gets new && deleted drives (listener)
   const newDisksUnlisten = listenOsDisks(({ payload }) => {
-    manageDisks(payload)
+    manageDisks([payload])
   })
 
-  // gets os disks
+  // gets os disks (on startup)
   getOsDisks().then(manageDisks)
 
   onDestroy(() => {

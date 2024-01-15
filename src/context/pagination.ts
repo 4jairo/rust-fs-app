@@ -3,10 +3,11 @@ import type { getDirContentType } from "../tauriApi/tauriApiTypes"
 import { SearchParamsTopMenuFs } from "./searchParamsTopMenuFs"
 import { FileContext } from "./fileContext"
 
+export const ITEMS_PER_PAGE = 50
+
 const createPaginationContext = () => {
   const Store = writable({
     lastItemIndex: 0,
-    ITEMS_PER_PAGE: 50,
     canPrevPage: false,
     canNextPage: false,
     itemsList: [] as getDirContentType[]
@@ -14,7 +15,7 @@ const createPaginationContext = () => {
 
   const travelPagination = (pagesAmmount: number) => {
     Store.update((prevState) => {
-      const { ITEMS_PER_PAGE, lastItemIndex, canPrevPage, canNextPage, itemsList } = prevState
+      const { lastItemIndex, canPrevPage, canNextPage, itemsList } = prevState
       const newPagesAmmount = (pagesAmmount * ITEMS_PER_PAGE) + lastItemIndex
       if (
         (!canNextPage && newPagesAmmount >= lastItemIndex) ||
@@ -31,7 +32,7 @@ const createPaginationContext = () => {
   }
 
   const paginatedItemList = () => {
-    const { lastItemIndex, ITEMS_PER_PAGE, itemsList } = get(Store)
+    const { lastItemIndex, itemsList } = get(Store)
     return itemsList.slice(lastItemIndex, lastItemIndex + ITEMS_PER_PAGE)    
   }
 
@@ -72,7 +73,7 @@ const createPaginationContext = () => {
       lastItemIndex: 0,
       canPrevPage: false,
       itemsList: filteredItemList,
-      canNextPage: filteredItemList.length > prevState.ITEMS_PER_PAGE,
+      canNextPage: filteredItemList.length > ITEMS_PER_PAGE,
     }))
   }
 
