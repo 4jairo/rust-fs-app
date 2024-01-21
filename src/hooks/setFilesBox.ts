@@ -112,6 +112,13 @@ function getAllPageRows() {
   return document.querySelectorAll<HTMLTableRowElement>('#mainContent-fs .table-row')
 }
 
+export function resetPageScroll() {
+  const parentElmt = document.getElementById('mainContent-fs-parent')
+  if (parentElmt) {
+    parentElmt.scrollTop = 0
+  }
+}
+
 export function getCurrPagePaths() {
   return Array
     .from(getAllPageRows())

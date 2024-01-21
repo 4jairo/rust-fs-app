@@ -3,6 +3,7 @@ import type { getDirContentType } from '../tauriApi/tauriApiTypes'
 import { useLimitedArraySize } from '../hooks/useLimitedArraySize'
 import { getDirContent, setWindowTitle } from '../tauriApi/invokeApi'
 import { showErrorAlert } from '../alerts/alerts'
+import { resetPageScroll } from '../hooks/setFilesBox'
 
 type CommomWindowFiltersPath = {
   path: string
@@ -59,7 +60,7 @@ const createFileContext = () => {
       const filterFileExtElmt = document.getElementById('fileExtFilter-fs') as HTMLSelectElement
       filterFileExtElmt.value = ''
       
-
+      resetPageScroll()
       setWindowTitle(paths[newCurrentPathIndex].path, paths[newCurrentPathIndex].name)
       Store.update((state) => ({
         filesExt: '',
@@ -87,6 +88,7 @@ const createFileContext = () => {
         ...(!isDirectory && { fileList })
       }], 20)
 
+      resetPageScroll()
       setWindowTitle(path, name)
       return {
         history: {
