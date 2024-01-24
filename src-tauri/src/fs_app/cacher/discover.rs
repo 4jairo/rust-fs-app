@@ -77,7 +77,7 @@ pub fn un_discover_disk(disk_path: String) {
         .par_iter_mut()
         .for_each(|(_, paths)| {
             paths.retain(|path| {
-                path.starts_with(&disk_path)
+                !path.starts_with(&disk_path)
             });
         }); 
 }
