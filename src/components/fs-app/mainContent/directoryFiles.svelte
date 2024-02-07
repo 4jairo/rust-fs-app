@@ -67,7 +67,7 @@
       <thead>
         <tr>
           {#each tableColumns as { sortFn, title }}
-            <th on:click={sortFn}>{title}</th>
+            <th on:dblclick={sortFn}>{title}</th>
           {/each}
         </tr>
       </thead>
