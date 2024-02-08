@@ -3,7 +3,6 @@ import { FileContext } from "./fileContext";
 import { FileOperationTypes, FileCopyContext, FileActionTypes, ContainerContext } from "./fileCopyContext";
 import { existentFile, getDirContent, searchByName } from "../tauriApi/invokeApi";
 import { useSplitPath } from "../hooks/useSplitPath";
-import { WindowLocationTypes } from "./currentWindowContext";
 import { get } from "svelte/store";
 import { PreVisualizationContext } from "./preVisualization";
 import { SearchParamsTopMenuFs } from "./searchParamsTopMenuFs";
@@ -17,13 +16,13 @@ import { SearchParamsTopMenuFs } from "./searchParamsTopMenuFs";
 
 const refreshFn = async () => {
   const { history } = get(FileContext)
-  const { absoluteName } = get(SearchParamsTopMenuFs)
+  const { absoluteName, caseSensitive } = get(SearchParamsTopMenuFs)
 
   const currPath = history.paths[history.currentPath]
   
   const files = currPath.isDirectory
     ? await getDirContent(currPath.path)
-    : await searchByName(currPath.path, currPath.name, absoluteName)
+    : await searchByName(currPath.path, currPath.name, absoluteName, caseSensitive)
   FileContext.updateFileListOnCurrentDir(files)
 }
 
@@ -155,8 +154,6 @@ const keyShortcutsFs: keyShortcutsType[] = [
   }
 ]
 
-const keyShortcutsApps: keyShortcutsType[] = []
-
 const findKey = (keys: keyShortcutsType['keys'], currKeys: string[]) => {
   const sortedKEys = keys.sort()
 
@@ -169,10 +166,8 @@ const findKey = (keys: keyShortcutsType['keys'], currKeys: string[]) => {
   return true
 }
 
-export function findKeyCombination(currentKeys: string[], windowContext: WindowLocationTypes) {
+export function findKeyCombination(currentKeys: string[]) {
   const currKeys = currentKeys.sort()
 
-  return windowContext === WindowLocationTypes.fs
-    ? keyShortcutsFs.find(({ keys }) => findKey(keys, currKeys))
-    : keyShortcutsApps.find(({ keys }) => findKey(keys, currKeys))
+  return keyShortcutsFs.find(({ keys }) => findKey(keys, currKeys))
 }

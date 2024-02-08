@@ -2,9 +2,6 @@
   import { onMount } from "svelte";
   import { ShortcutKeysContext } from "../../../context/shortcutKey";
   import { findKeyCombination } from "../../../context/shortcutKeyFunctions";
-  import { WindowLocationContext } from "../../../context/currentWindowContext";
-
-  $: windowContext = $WindowLocationContext
 
   // keyboard shortcuts
   const handleKeyDown = (e: KeyboardEvent) => {
@@ -19,7 +16,7 @@
 
     ShortcutKeysContext.addKey(key)
 
-    const shortcutData = findKeyCombination($ShortcutKeysContext.keys, windowContext)
+    const shortcutData = findKeyCombination($ShortcutKeysContext.keys)
     if (shortcutData) shortcutData.fn()
   }
 

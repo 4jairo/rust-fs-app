@@ -5,7 +5,6 @@
   import type { SubmitEv } from '../../common/eventListenerTypes';
   import topMenuStyles from '../../common/topMenu.module.css'
   import Icons from '../../common/icons.svelte';
-  import { WindowLocationContext, WindowLocationTypes } from '../../../context/currentWindowContext';
   import { FileContext } from '../../../context/fileContext'; 
   import { DirTreeLoadContext, Visibility } from '../../../context/dirTreeLoadStatus'; 
   import { searchByName } from '../../../tauriApi/invokeApi';
@@ -23,6 +22,8 @@
   )
 
   $: searchParamsContext = $SearchParamsTopMenuFs
+  $: fromCurrentPathText = searchParamsContext.fromCurrentPath ? 'From this folder' : 'All disks'
+  $: absoluteNameText = searchParamsContext.absoluteName ? 'Only exact name' : 'Includes name'
 
   const handleSubmitSearch = async (event: SubmitEv<HTMLFormElement>) => {
     const currentPath = searchParamsContext.fromCurrentPath
@@ -35,7 +36,7 @@
     const task = () => {
       SearchParamsTopMenuFs.updateLastSearchQuery(searchValue)
 
-      searchByName(currentPath, searchValue, searchParamsContext.absoluteName)
+      searchByName(currentPath, searchValue, searchParamsContext.absoluteName, searchParamsContext.caseSensitive)
       .then(fileList => {
         FileContext.addDirToHistory({
           fileList,
@@ -64,16 +65,6 @@
 </script>
 
 <header class={topMenuStyles.container} on:click={updateContainerContext}>
-  <section 
-    on:click={() => WindowLocationContext.toggleCurrentWnidow()}
-    class="{topMenuStyles.hovereable} {topMenuStyles.changeWindowContent}"
-  >
-    <div>
-      <Icons icon={$WindowLocationContext === WindowLocationTypes.apps ? 'sw-right' : 'sw-left'}/>
-    </div>
-    <div>apps</div>
-  </section>
-
   <section>
     <div 
       class="{cantHistoryBack ? topMenuStyles.notAvaliable : ''} {topMenuStyles.hovereable}"
@@ -124,27 +115,19 @@
 
   <div class="searchContainer"> 
     <div class='toggleSearchParams'>
-      <div>
-        <label>
-          <div><Icons icon='exact-name' size={20}/></div>
-          <p>{searchParamsContext.absoluteName ? 'Only exact name' : 'Includes name'}</p>
-          <input 
-            hidden type='checkbox' name='absoluteMatch' 
-            bind:checked={searchParamsContext.absoluteName}
-            on:input={(e) => SearchParamsTopMenuFs.updateAbsoluteName(e.currentTarget.checked)}
-          />
-        </label>
+      <div on:click={() => SearchParamsTopMenuFs.updateCaseSensitive()} title="Case Sensitive: {searchParamsContext.caseSensitive.toString()}">
+        <div><Icons icon={searchParamsContext.caseSensitive ? 'lowercase' : 'uppercase'} size={20}/></div>
+        <p>Case Sensitive</p>
       </div>
-      <div>
-        <label>
-          <div><Icons icon='folder-path' size={22}/></div>
-          <p>{searchParamsContext.fromCurrentPath ? 'From this folder' : 'All disks'}</p>
-          <input 
-            hidden type='checkbox' name='absoluteMatch'
-            bind:checked={searchParamsContext.fromCurrentPath}
-            on:input={(e) => SearchParamsTopMenuFs.updateFromCurrentPath(e.currentTarget.checked)}
-          />
-        </label>
+
+      <div on:click={() => SearchParamsTopMenuFs.updateAbsoluteName()} title={absoluteNameText}>
+        <div><Icons icon={searchParamsContext.absoluteName ? 'underline-fill' : 'underline'} size={20}/></div>
+        <p>{absoluteNameText}</p>
+      </div>
+      
+      <div on:click={() => SearchParamsTopMenuFs.updateFromCurrentPath()} title={fromCurrentPathText}>
+        <div><Icons icon={searchParamsContext.fromCurrentPath ? 'folder-link-fill' : 'folder-link'} size={22}/></div>
+        <p>{fromCurrentPathText}</p>
       </div>
     </div>
 
@@ -187,6 +170,7 @@
   }
 
   .searchContainer {
+    height: 85%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -205,51 +189,36 @@
 
   .toggleSearchParams {
     display: flex;
-    flex-direction: column;
     align-items: center;
+    gap: 10px;
+    height: 100%
+  }
+  .toggleSearchParams > div {
+    border: solid 1px var(--borderColor);
+    display: flex;
     justify-content: center;
-  }
-  .toggleSearchParams > div {
-    border-bottom: solid 1px var(--borderColor);
-    border-left: solid 1px var(--borderColor);
-    border-right: solid 1px var(--borderColor);
-    cursor: pointer;
-    padding: 1px;
+    align-items: center;  
+    height: 85%;
+    padding: 0 10px;
+    gap: 10px;
     border-radius: 3px;
-    width: 150px;
-    text-align: center;
+    cursor: pointer;
   }
-  .toggleSearchParams > div {
-    position: relative;
-  }
-  .toggleSearchParams > div > label > p {
-    padding-left: 25px;
-  }
-  .toggleSearchParams > div > label > div {
-    position: absolute;
-    left: 5px;
+
+  .toggleSearchParams > div > p {
+    display: none;
   }
 
 
   .toggleSearchParams > div:hover {
     background-color: var(--hoverColor)
   }
-  @media (min-width: 1080px) {
-    .searchContainer {
-      height: 100%;
-    }
-    .toggleSearchParams {
-      display: flex;
-      flex-direction: row;
-      gap: 10px;
-      height: 100%
+  @media (min-width: 1100px) {
+    .toggleSearchParams > div > p {
+      display: block
     }
     .toggleSearchParams > div {
-      border: solid 1px var(--borderColor);
-      height: 85%;
-      display: flex;
-      justify-content: center;
-      align-items: center;  
+      width: 150px;
     }
   }
 </style>

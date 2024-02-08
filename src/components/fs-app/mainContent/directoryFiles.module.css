@@ -39,6 +39,7 @@
   padding: 4px;
 }
 .fileTable th, .fileTable td {
+  overflow: hidden;
   min-width: 80px;
   border-bottom: solid 1px var(--borderColor);
   height: 38px;

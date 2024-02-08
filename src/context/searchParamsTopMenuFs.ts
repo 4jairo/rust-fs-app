@@ -5,17 +5,22 @@ const createContext = () => {
   const { update, subscribe } = writable({
     absoluteName: false,
     fromCurrentPath: true,
+    caseSensitive: true,
     filterQuery: '',
     searchQuery: '',
     lastSearchQuery: '',
   })
 
-  const updateAbsoluteName = (newValue: boolean) => update(prev => ({
-    ...prev, absoluteName: newValue
+  const updateAbsoluteName = (newValue?: boolean) => update(prev => ({
+    ...prev, absoluteName: newValue ?? !prev.absoluteName 
   }))
 
-  const updateFromCurrentPath = (newValue: boolean) => update(prev => ({
-    ...prev, fromCurrentPath: newValue
+  const updateCaseSensitive = (newValue?: boolean) => update(prev => ({
+    ...prev, caseSensitive: newValue ?? !prev.caseSensitive 
+  }))
+
+  const updateFromCurrentPath = (newValue?: boolean) => update(prev => ({
+    ...prev, fromCurrentPath: newValue ?? !prev.fromCurrentPath
   }))
 
   const updateSearchQuery = (newValue: string) => update(prev => ({
@@ -40,6 +45,7 @@ const createContext = () => {
     updateFromCurrentPath,
     updateLastSearchQuery,
     updateSearchQuery,
+    updateCaseSensitive,
     subscribe
   } 
 }

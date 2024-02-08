@@ -42,9 +42,6 @@ const enum INVOKE_TYPES {
   startOnBootChange = 'start_on_boot_change',
   startOnBootChangeListener = 'start_on_boot_listener',
   setWindowTitle = 'set_window_title',
-
-  //! apps
-  getAllApps = 'get_all_apps',
 }
 
 export const errorListener: invokeApi.error = async (cb) => {
@@ -87,10 +84,10 @@ export const getDirContent: invokeApi.getDirContent = async (path) => {
   return invoke(INVOKE_TYPES.getDirContent, { path })
 }
 
-export const searchByName: invokeApi.searchByName = async (path, fileName, onlyAbsolute) => {
+export const searchByName: invokeApi.searchByName = async (path, fileName, onlyAbsolute, caseSensitive) => {
   try {
     return await invoke(INVOKE_TYPES.searchByName, { 
-      path, fileName, onlyAbsolute
+      path, fileName, onlyAbsolute, caseSensitive
     })
   } catch (error) {
     await showErrorAlert(error as string)
@@ -230,14 +227,4 @@ export const setWindowTitle = async (path: string, name: string) => {
     : path || `🔍(${name})`
 
   await invoke(INVOKE_TYPES.setWindowTitle, { title })
-}
-
-//! apps
-export const getAllApps: invokeApi.getAllApps = async () => {
-  try {
-    return await invoke(INVOKE_TYPES.getAllApps)
-  } catch (error) {
-    await showErrorAlert(error as string)
-    return {}
-  }
 }

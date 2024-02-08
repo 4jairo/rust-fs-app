@@ -58,7 +58,7 @@ export namespace invokeApi {
   //! 2.- get files/dirs
   type getDirContent = (path: string) => Promise<getDirContentType[]> // -> error -> null
 
-  type searchByName = (path: string, fileName: string, onlyAbsolute: boolean) => Promise<getDirContentType[]>
+  type searchByName = (path: string, fileName: string, onlyAbsolute: boolean, caseSensitive: boolean) => Promise<getDirContentType[]>
 
   //! 3.- modify files/dirs
   type openFile = (filePath: string, administrator?: boolean) => Promise<null> // error -> string

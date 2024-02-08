@@ -4,7 +4,6 @@
 
 mod background;
 mod fs_app;
-mod remove_app;
 mod window_events;
 
 use fs_app::{
@@ -14,8 +13,6 @@ use fs_app::{
     open_application::{open_terminal, open_windows_fs}, 
 };
 
-use remove_app::get_reg_content::{get_all_apps, search_app_reg};
-use remove_app::launch_app::launch_app;
 
 use window_events::{start_on_boot_change, set_window_title};
 use background::{system_tray_menu, system_tray_event_handler, handle_cli_commands, window_event_handler, handle_cli_from_argv};
@@ -76,12 +73,7 @@ fn main() -> tauri::Result<()> {
             existent_file,
             get_path_parent,
             start_on_boot_change,
-            set_window_title,
-            
-            //? apps
-            search_app_reg,
-            get_all_apps,
-            launch_app
+            set_window_title
         ])
         .run(tauri::generate_context!())?;
     Ok(())

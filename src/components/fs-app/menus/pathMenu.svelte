@@ -15,6 +15,7 @@
   import { SearchParamsTopMenuFs } from '../../../context/searchParamsTopMenuFs'
   import { existentFile, getDirContent, getPathParent, openFile, searchByName } from '../../../tauriApi/invokeApi'
   import { PaginationContext } from '../../../context/pagination';
+  import { get } from 'svelte/store';
   
   let pathInputShape = false
   $: windowHistory = $FileContext.history
@@ -69,13 +70,14 @@
     if(fileSearch.is_dir) {
       if(currentPath.path !== newPath) return
 
+      const { absoluteName, caseSensitive } = get(SearchParamsTopMenuFs)
       return FileContext.addDirToHistory({
         isDirectory: currentPath.isDirectory,
         name: useSplitPath(newPath).pop() as string,
         path: newPath,
         fileList: currentPath.isDirectory
           ? await getDirContent(newPath)
-          : await searchByName(newPath, currentPath.name, $SearchParamsTopMenuFs.absoluteName)
+          : await searchByName(newPath, currentPath.name, absoluteName, caseSensitive)
       })
     }
 

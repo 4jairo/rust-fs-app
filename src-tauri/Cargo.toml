@@ -20,7 +20,6 @@ lazy_static = "1.4.0"
 disk_list = "0.2.10"
 notify = "6.1.1"
 open = "5.0.0"
-winreg = "0.51.0"
 trash = "3.1.2"
 rustc-hash = "1.1.0" 
 tauri-plugin-autostart = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }

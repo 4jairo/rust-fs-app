@@ -10,6 +10,3 @@ front-end:
 back-end:
   frequent files
   move searches to backend ($FileContext) (better???)
-
-both: 
-  remove app

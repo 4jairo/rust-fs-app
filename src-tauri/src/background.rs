@@ -22,8 +22,8 @@ pub fn new_window<R: Runtime>(visible: bool, manager: &impl Manager<R>, path: Op
         .fullscreen(false)
         .resizable(true)
         .title(path.unwrap_or("fs-app"))
-        .inner_size(800.0, 600.0)
-        .min_inner_size(860.0, 0.0)
+        .inner_size(1100.0, 650.0)
+        .min_inner_size(770.0, 0.0)
         .center()
         .focused(true)
         .additional_browser_args("--disable-features=ElasticOverscroll")
@@ -117,6 +117,7 @@ pub fn handle_cli_from_argv(handle: &AppHandle, argv: Vec<String>) {
     let mut is_path_value = false;
 
     for arg in argv {
+        println!("arg: {}", arg);
         if arg == "-h" || arg == "--headless" {
             return;
         }

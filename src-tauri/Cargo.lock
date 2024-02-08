@@ -1126,7 +1126,6 @@ dependencies = [
  "tauri-plugin-autostart",
  "tauri-plugin-single-instance",
  "trash",
- "winreg 0.51.0",
 ]
 
 [[package]]

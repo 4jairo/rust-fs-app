@@ -37,22 +37,43 @@ fn walk_from_dir(files: ReadDir) {
     }
 }
 
-pub fn get_dir_tree_absolute_name(value: &str) -> Option<Vec<PathBuf>> {
-    let dir_tree_cache = &DIR_TREE_CACHE.lock()
-    .expect("unable to lock mutex");
+pub struct DirTreeSearcher;
+impl DirTreeSearcher {
+    pub fn not_case_sensitive_exact_name(lower_value: &str) -> Vec<(String, Vec<PathBuf>)> {
+        let dir_tree_cache = &DIR_TREE_CACHE.lock().unwrap();
+        dir_tree_cache
+            .par_iter()
+            .filter(|(key, _)| key.to_lowercase() == lower_value)
+            .map(|(key, paths)| (key.clone(), paths.to_owned()))
+            .collect::<Vec<(String, Vec<PathBuf>)>>()
+    }
 
-    dir_tree_cache.get(value).cloned()
-}
+    pub fn case_sensitive_exact_name(value: &str) -> Vec<(String, Vec<PathBuf>)> {
+        let dir_tree_cache = &DIR_TREE_CACHE.lock().unwrap();
+        let result = dir_tree_cache.get(value).cloned().unwrap_or_default();
 
-pub fn get_dir_tree_not_absolute_name(value: &str) -> Vec<(String, Vec<PathBuf>)> {
-    let dir_tree_cache = &DIR_TREE_CACHE.lock()
-    .expect("unable to lock mutex");
+        vec![(value.to_string(), result)]
+    }
 
-    dir_tree_cache
-        .par_iter()
-        .filter(|(key, _)| key.contains(value))
-        .map(|(key, paths)| (key.clone(), paths.to_owned()))
-        .collect::<Vec<(String, Vec<PathBuf>)>>()
+    pub fn not_case_sensitive_not_exact_name(lower_value: &str) -> Vec<(String, Vec<PathBuf>)> {
+        let dir_tree_cache = &DIR_TREE_CACHE.lock().unwrap();
+
+        dir_tree_cache
+            .par_iter()
+            .filter(|(key, _)| key.to_lowercase().contains(lower_value))
+            .map(|(key, paths)| (key.clone(), paths.to_owned()))
+            .collect::<Vec<(String, Vec<PathBuf>)>>()
+    }
+
+    pub fn case_sensitive_not_exact_name(value: &str) -> Vec<(String, Vec<PathBuf>)> {
+        let dir_tree_cache = &DIR_TREE_CACHE.lock().unwrap();
+
+        dir_tree_cache
+            .par_iter()
+            .filter(|(key, _)| key.contains(value))
+            .map(|(key, paths)| (key.clone(), paths.to_owned()))
+            .collect::<Vec<(String, Vec<PathBuf>)>>()
+    }
 }
 
 pub fn discover_disk(disk_path: &String) -> Result<u128, String> {
