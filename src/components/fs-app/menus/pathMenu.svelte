@@ -68,7 +68,7 @@
     const fileSearch = await existentFile(newPath)
 
     if(fileSearch.is_dir) {
-      if(currentPath.path !== newPath) return
+      if(currentPath.path === newPath) return
 
       const { absoluteName, caseSensitive } = get(SearchParamsTopMenuFs)
       return FileContext.addDirToHistory({
