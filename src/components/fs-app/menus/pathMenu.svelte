@@ -70,10 +70,12 @@
     if(fileSearch.is_dir) {
       if(currentPath.path === newPath) return
 
-      const { absoluteName, caseSensitive } = get(SearchParamsTopMenuFs)
+      const { absoluteName, caseSensitive, searchQuery } = get(SearchParamsTopMenuFs)
       return FileContext.addDirToHistory({
         isDirectory: currentPath.isDirectory,
-        name: useSplitPath(newPath).pop() as string,
+        name: currentPath.isDirectory
+          ? useSplitPath(newPath).pop() as string
+          : searchQuery,
         path: newPath,
         fileList: currentPath.isDirectory
           ? await getDirContent(newPath)

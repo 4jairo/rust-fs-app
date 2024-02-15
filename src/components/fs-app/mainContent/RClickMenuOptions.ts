@@ -2,6 +2,8 @@ import type { RCLickOptionsType } from "./directoryFilesProps";
 import { FileOperationTypes, FileCopyContext, FileActionTypes } from "../../../context/fileCopyContext";
 import { getPathParent, openFile, openTerminal, openWindowsFs } from "../../../tauriApi/invokeApi";
 import { showErrorAlert } from "../../../alerts/alerts";
+import { handleOpenFolder } from "../../../hooks/hanldeOpenFolder";
+import { useSplitPath } from "../../../hooks/useSplitPath";
 
 export const getRclickOptions = async (isFile: boolean, selectedPath: string) => {
   const handleOpenTerminal = async () => {
@@ -26,7 +28,7 @@ export const getRclickOptions = async (isFile: boolean, selectedPath: string) =>
   ? await getPathParent(selectedPath) as string
   : selectedPath
 
-  return [
+  const result: RCLickOptionsType[] = [
     { 
       title: 'Open as admin', 
       icon: 'admin', 
@@ -35,6 +37,11 @@ export const getRclickOptions = async (isFile: boolean, selectedPath: string) =>
       separation: true 
     },
     //--------------------------------------------------------------
+    {
+      title: isFile ? 'Go to folder' : 'Open',
+      fn: () => handleOpenFolder(useSplitPath(folderPath).pop()!, folderPath),
+      icon: 'folder-path'
+    },
     { 
       title: 'Windows Explorer', 
       icon: 'folder-open',
@@ -93,5 +100,7 @@ export const getRclickOptions = async (isFile: boolean, selectedPath: string) =>
       icon: 'terminal', 
       fn: handleOpenTerminal 
     },
-  ] as RCLickOptionsType[]
+  ]
+
+  return result
 }
