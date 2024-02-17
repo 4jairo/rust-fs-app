@@ -1,4 +1,4 @@
-import { pictureDir, downloadDir, desktopDir, documentDir, homeDir, videoDir } from '@tauri-apps/api/path'
+import { pictureDir, downloadDir, desktopDir, documentDir, homeDir, videoDir, dataDir } from '@tauri-apps/api/path'
 
 export const getConstantDirs = async () => {
   const [
@@ -7,15 +7,17 @@ export const getConstantDirs = async () => {
     Downloads, 
     Documents,
     Images,
-    Videos
+    Videos,
+    AppData
   ] = await Promise.all([
     homeDir(),
     desktopDir(),
     downloadDir(),
     documentDir(),
     pictureDir(),
-    videoDir()
+    videoDir(),
+    dataDir()
   ])
 
-  return { Home, Desktop, Downloads, Documents, Images, Videos }
+  return { Home, Desktop, Downloads, Documents, Images, Videos, AppData }
 }

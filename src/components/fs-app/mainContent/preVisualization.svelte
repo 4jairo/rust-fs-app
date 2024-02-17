@@ -81,7 +81,7 @@
 <div class="container" on:click={updateContainerContext}>
   <div class="resizeBar" on:mousedown={handleResize}></div>
 
-  <div class="content" id="preVisualizationContainer">
+  <div class="content">
     {#if fileContent.isImage}
       <!-- image -->
       <img src={fileContent.content} alt={currentPath}/>
@@ -117,6 +117,7 @@
   .content {
     padding-left: 8px;
     width: 100%;
+    user-select: text;
   }
   .content > pre {
     margin: 0;
@@ -134,6 +135,6 @@
     padding: 2px;
     height: 100%;
     cursor: col-resize;
-    position: absolute;
+    position: fixed;
   }
 </style>

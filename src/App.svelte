@@ -17,6 +17,7 @@
   import BottomUtilitiesMenuFs from './components/fs-app/menus/bottomUtilitiesMenu.svelte'
   import LateralBarFs from './components/fs-app/lateralBar/lateralBar.svelte'
   import PreVisualizationFs from './components/fs-app/mainContent/preVisualization.svelte'
+  import { PreVisualizationContext } from './context/preVisualization';
 
   const parseCliPath = async (path: string) => {
     const absolutePath = await resolve(path)
@@ -42,6 +43,7 @@
     }
   }
 
+  $: preVisualizacionVisible = $PreVisualizationContext.visible
   let loading = true
 
   onMount(async () => {
@@ -95,7 +97,9 @@
     <div class='mainContentContainer'>
       <LateralBarFs />
       <MainContentFs />
-      <PreVisualizationFs />
+      {#if preVisualizacionVisible}
+        <PreVisualizationFs />
+      {/if}
     </div>
     <BottomUtilitiesMenuFs />
   </main>
